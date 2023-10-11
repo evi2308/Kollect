@@ -6,10 +6,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
+import com.evasanchez.kollect.navigation.AppNavigation
 
 class LoginScreenViewModel : ViewModel() {
     private val auth: FirebaseAuth = Firebase.auth
@@ -35,11 +37,12 @@ class LoginScreenViewModel : ViewModel() {
     private fun isValidEmail(email: String): Boolean = Patterns.EMAIL_ADDRESS.matcher(email).matches()
 
 
-    fun singInEmailPassword(email:String, password:String) = viewModelScope.launch{
+    fun singInEmailPassword(email:String, password:String, homeScreen: ()-> Unit) = viewModelScope.launch{
         try {
             auth.signInWithEmailAndPassword(email, password).addOnCompleteListener{ task->
                 if (task.isSuccessful){
                     Log.d("Kollect", "Iniciando sesion correctamente....")
+                    homeScreen()
                 }
                 else{
                     Log.d("Kollect", "${task.result.toString()}")
