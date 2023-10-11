@@ -43,21 +43,24 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.evasanchez.kollect.R
 import com.evasanchez.kollect.ViewModels.LoginScreenViewModel
+import com.evasanchez.kollect.navigation.AppScreens
 
 @Composable
-fun LoginScreen(viewModel : LoginScreenViewModel){
+fun LoginScreen(navController: NavController,viewModel : LoginScreenViewModel){
     Box(
         Modifier
             .fillMaxSize()
             .padding(16.dp)) {
-        Login(Modifier.align(Alignment.Center), viewModel)
+        Login(Modifier.align(Alignment.Center), viewModel, navController)
     }
 }
 
 @Composable
-fun Login(modifier: Modifier, viewModel: LoginScreenViewModel){
+fun Login(modifier: Modifier, viewModel: LoginScreenViewModel, navController: NavController){
 
     val email :String by viewModel.email.observeAsState(initial = "")
     val password :String by viewModel.password.observeAsState(initial = "")
@@ -65,7 +68,6 @@ fun Login(modifier: Modifier, viewModel: LoginScreenViewModel){
         mutableStateOf(false)
     }
     val loginEnabled: Boolean by viewModel.loginEnabled.observeAsState(initial = false)
-
     Column(modifier = modifier){
         HeaderImage(Modifier.align(Alignment.CenterHorizontally))
         Spacer(modifier = Modifier.padding(16.dp))
@@ -79,7 +81,10 @@ fun Login(modifier: Modifier, viewModel: LoginScreenViewModel){
             .fillMaxWidth()
             .padding(2.dp)){
             RegisterButton()
-            LoginButton(loginEnabled){viewModel.singInEmailPassword(email, password)}
+            LoginButton(loginEnabled){
+                viewModel.singInEmailPassword(email, password){
+                    navController.navigate(AppScreens.HomeScreen.route)
+                }}
 
         }
     }
@@ -118,7 +123,10 @@ fun RegisterButton() {
 
 @Composable
 fun LoginButton(loginEnabled: Boolean, singInEmailPassword:()->Unit) {
-    Button(onClick = {singInEmailPassword()}, modifier = Modifier
+    Button(onClick = {
+        if(loginEnabled){
+        singInEmailPassword()
+    }}, modifier = Modifier
         .height(48.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0xFFF1D5DB),

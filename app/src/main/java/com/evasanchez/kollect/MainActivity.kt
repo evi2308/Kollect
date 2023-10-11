@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.evasanchez.kollect.ViewModels.LoginScreenViewModel
+import com.evasanchez.kollect.navigation.AppNavigation
 import com.evasanchez.kollect.ui.theme.KollectTheme
 import com.evasanchez.kollect.uiclasses.LoginPreview
 import com.evasanchez.kollect.uiclasses.LoginScreen
@@ -19,23 +20,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            LoginScreen(LoginScreenViewModel())
+            AppNavigation()
             }
         }
     }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    KollectTheme {
-        Greeting("Android")
-    }
-}
+
