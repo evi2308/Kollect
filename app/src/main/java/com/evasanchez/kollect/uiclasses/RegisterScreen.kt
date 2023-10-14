@@ -1,56 +1,130 @@
 package com.evasanchez.kollect.uiclasses
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.evasanchez.kollect.R
+import com.evasanchez.kollect.ViewModels.RegisterScreenViewModel
+import com.evasanchez.kollect.navigation.AppScreens
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 
 
 @Composable
-fun RegisterScreen(){
+fun RegisterScreen(navController: NavController, viewModel: RegisterScreenViewModel) {
+
     Box(
         Modifier
             .fillMaxSize()
-            .padding(16.dp)) {
-        Register(Modifier.align(Alignment.Center))
+            .padding(16.dp)
+    ) {
+        Register(Modifier.align(Alignment.Center), navController, viewModel)
     }
 
 }
 
 @Composable
-fun Register(modifier: Modifier) {
-    Column(modifier = modifier){
-        emailRegister(modifier)
-        //emailRegisterText()
-        //emailRegisterTextField()
+fun Register(modifier: Modifier, navController: NavController, viewModel: RegisterScreenViewModel) {
+
+    val email: String by viewModel.email.observeAsState(initial = "")
+    val password: String by viewModel.password.observeAsState(initial = "")
+    val isPassVisible = rememberSaveable {
+        mutableStateOf(false)
+    }
+    val loginEnabled: Boolean by viewModel.loginEnabled.observeAsState(initial = false)
+    val username: String by viewModel.username.observeAsState(initial = "")
+    Column(modifier = modifier) {
+        HeaderRegister(Modifier.align(Alignment.CenterHorizontally))
+        Spacer(modifier = Modifier.padding(8.dp))
+        emailRegister(modifier, email) { viewModel.onRegisterChanged(it, password, username) }
         Spacer(modifier = Modifier.padding(4.dp))
-        PasswordRegisterText()
-        PasswordRegisterTextField()
+        usernameRegister(modifier, username) { viewModel.onRegisterChanged(email, password, it) }
+        Spacer(modifier = Modifier.padding(4.dp))
+        PasswordRegister(modifier, password, { viewModel.onRegisterChanged(email, it, username) }, isPassVisible
+        )
+        Spacer(modifier = Modifier.padding(4.dp))
+        RegistrarButton(loginEnabled) {
+            viewModel.singInEmailPassword(email, password) {
+                navController.navigate(AppScreens.HomeScreen.route)
+            }
+        }
+
     }
 
 }
+
+@Composable
+fun RegistrarButton(loginEnabled: Boolean, signInEmailPassword: () -> Unit) {
+    Button(
+        onClick = {
+            if (loginEnabled) {
+                signInEmailPassword()
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFFF1D5DB),
+            disabledContainerColor = Color(0xFF7D5260)
+            ),
+        enabled = loginEnabled
+    ) {
+        Text(text = "Registrarse")
+    }
+}
+
+@Composable
+fun HeaderRegister(modifier: Modifier) {
+    Image(
+        painterResource(id = R.drawable.logo),
+        contentDescription = "Logo de Kollect",
+        modifier = modifier
+    )
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun emailRegister(modifier: Modifier) {
-    Column(modifier = modifier){
+fun emailRegister(modifier: Modifier, email: String, onTextFieldChanged: (String) -> Unit) {
+    Column(modifier = modifier) {
         Text(
             text = "Introduce tu E-Mail",
             textAlign = TextAlign.Left,
@@ -58,41 +132,67 @@ fun emailRegister(modifier: Modifier) {
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(8.dp)
         )
-        TextField(
-            value = "", onValueChange = {},
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text(text = "ejemplo@ejemplo.com") },
+        OutlinedTextField(
+            value = email,
+            onValueChange = { onTextFieldChanged(it) },
+            placeholder = { Text("ejemplo@ejemplo.com") },
+            textStyle = TextStyle(color = Color.Black),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true,
             maxLines = 1,
-            colors = TextFieldDefaults.textFieldColors(
+            label = { Text("E-mail") },
+            colors = TextFieldDefaults.outlinedTextFieldColors(
                 textColor = Color(0xFFFFFFFF),
-                containerColor = Color(0xFFF1D5DB),
                 placeholderColor = Color(0xFFFFFFFF),
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+
+                //focusedIndicatorColor = Color.Transparent,
+                //unfocusedIndicatorColor = Color.Transparent,
+                //disabledIndicatorColor = Color.Transparent
             ),
             shape = RoundedCornerShape(15.dp)
         )
-
     }
-
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun emailRegisterText() {
-    Text(
-        text = "Introduce tu E-Mail",
-        textAlign = TextAlign.Left,
-        color = Color(0xFF7D5260),
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(8.dp)
-    )
+fun usernameRegister(modifier: Modifier, username: String, onTextFieldChanged: (String) -> Unit) {
+    Column(modifier = modifier) {
+        Text(
+            text = "Introduce tu nombre de usuario",
+            textAlign = TextAlign.Left,
+            color = Color(0xFF7D5260),
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(8.dp)
+        )
+        OutlinedTextField(
+            value = username,
+            onValueChange = { onTextFieldChanged(it) },
+            placeholder = { Text(text = "username") },
+            textStyle = TextStyle(color = Color.Black),
+            singleLine = true,
+            maxLines = 1,
+            label = { Text("username") },
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                textColor = Color(0xFFFFFFFF),
+                placeholderColor = Color(0xFFFFFFFF),
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.primary
+                //focusedIndicatorColor = Color.Transparent,
+                //unfocusedIndicatorColor = Color.Transparent,
+                //disabledIndicatorColor = Color.Transparent
+            ),
+            shape = RoundedCornerShape(15.dp)
+        )
+    }
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PasswordRegisterText() {
+fun PasswordRegister(modifier: Modifier,password: String, onTextFieldChanged: (String) -> Unit, isPassVisible: MutableState<Boolean>) {
     Text(
         text = "Introduce tu contraseña",
         textAlign = TextAlign.Left,
@@ -100,8 +200,39 @@ fun PasswordRegisterText() {
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(8.dp)
     )
+    val visualTransformation = if (isPassVisible.value)
+        VisualTransformation.None
+    else PasswordVisualTransformation()
+
+    OutlinedTextField(value = password,
+        onValueChange = {onTextFieldChanged(it)},
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        textStyle = TextStyle(color = Color.Black),
+        singleLine = true,
+        maxLines = 1,
+        label = { Text("Contraseña") },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            textColor = Color(0xFFFFFFFF),
+            placeholderColor = Color(0xFFFFFFFF),
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.primary
+            //focusedIndicatorColor = Color.Transparent,
+            //unfocusedIndicatorColor = Color.Transparent,
+            //disabledIndicatorColor = Color.Transparent
+        ),
+        shape = RoundedCornerShape(15.dp),
+        visualTransformation = visualTransformation,
+        trailingIcon = {
+            if (password != "") {
+                IsPassVisibleIcon(isPassVisible)
+            }
+        }
+    )
+
 }
 
+
+/*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun emailRegisterTextField() {
@@ -127,7 +258,8 @@ fun emailRegisterTextField() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasswordRegisterTextField() {
-    TextField(value = "", onValueChange = {},
+    TextField(
+        value = "", onValueChange = {},
         modifier = Modifier.fillMaxWidth(),
         placeholder = { Text(text = "*********") },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -143,11 +275,8 @@ fun PasswordRegisterTextField() {
         ),
         shape = RoundedCornerShape(15.dp)
     )
-}
+}}
+*/
 
 
-@Preview(showSystemUi = true, showBackground = true)
-@Composable
-fun RegisterPreview(){
-    RegisterScreen()
-}
+
