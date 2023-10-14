@@ -43,6 +43,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.evasanchez.kollect.R
@@ -50,41 +51,46 @@ import com.evasanchez.kollect.ViewModels.LoginScreenViewModel
 import com.evasanchez.kollect.navigation.AppScreens
 
 @Composable
-fun LoginScreen(navController: NavController,viewModel : LoginScreenViewModel){
+fun LoginScreen(navController: NavController, viewModel: LoginScreenViewModel) {
     Box(
         Modifier
             .fillMaxSize()
-            .padding(16.dp)) {
+            .padding(16.dp)
+    ) {
         Login(Modifier.align(Alignment.Center), viewModel, navController)
     }
 }
 
 @Composable
-fun Login(modifier: Modifier, viewModel: LoginScreenViewModel, navController: NavController){
+fun Login(modifier: Modifier, viewModel: LoginScreenViewModel, navController: NavController) {
 
-    val email :String by viewModel.email.observeAsState(initial = "")
-    val password :String by viewModel.password.observeAsState(initial = "")
+    val email: String by viewModel.email.observeAsState(initial = "")
+    val password: String by viewModel.password.observeAsState(initial = "")
     val isPassVisible = rememberSaveable {
         mutableStateOf(false)
     }
     val loginEnabled: Boolean by viewModel.loginEnabled.observeAsState(initial = false)
-    Column(modifier = modifier){
+
+    Column(modifier = modifier) {
         HeaderImage(Modifier.align(Alignment.CenterHorizontally))
         Spacer(modifier = Modifier.padding(16.dp))
         TextEmail()
-        EmailField(email, {viewModel.onLoginChanged(it, password)})
+        EmailField(email, { viewModel.onLoginChanged(it, password) })
         Spacer(modifier = Modifier.padding(4.dp))
         TextPassword()
-        PasswordField(password, {viewModel.onLoginChanged(email, it)}, isPassVisible)
+        PasswordField(password, { viewModel.onLoginChanged(email, it) }, isPassVisible)
         Spacer(modifier = Modifier.padding(8.dp))
-        Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier
-            .fillMaxWidth()
-            .padding(2.dp)){
-            RegisterButton()
-            LoginButton(loginEnabled){
-                viewModel.singInEmailPassword(email, password){
+        Row(
+            horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier
+                .fillMaxWidth()
+                .padding(2.dp)
+        ) {
+            RegisterButton(navController)
+            LoginButton(loginEnabled) {
+                viewModel.singInEmailPassword(email, password) {
                     navController.navigate(AppScreens.HomeScreen.route)
-                }}
+                }
+            }
 
         }
     }
@@ -114,24 +120,32 @@ fun TextPassword() {
 }
 
 @Composable
-fun RegisterButton() {
-    Button(onClick = { /*TODO*/ }, modifier = Modifier
-        .height(48.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF1D5DB))) {
+fun RegisterButton(navController: NavController) {
+    Button(
+        onClick = { navController.navigate(AppScreens.RegisterScreen.route) },
+        modifier = Modifier
+            .height(48.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF1D5DB))
+    ) {
         Text(text = "Registrarse")
     }
 }
 
 @Composable
-fun LoginButton(loginEnabled: Boolean, singInEmailPassword:()->Unit) {
-    Button(onClick = {
-        if(loginEnabled){
-        singInEmailPassword()
-    }}, modifier = Modifier
-        .height(48.dp),
+fun LoginButton(loginEnabled: Boolean, singInEmailPassword: () -> Unit) {
+    Button(
+        onClick = {
+            if (loginEnabled) {
+                singInEmailPassword()
+            }
+        },
+        modifier = Modifier
+            .height(48.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0xFFF1D5DB),
-            disabledContainerColor = Color(0xFF7D5260)),
-        enabled = loginEnabled) {
+            disabledContainerColor = Color(0xFF7D5260)
+        ),
+        enabled = loginEnabled
+    ) {
         Text(text = "Iniciar Sesión")
 
     }
@@ -139,13 +153,13 @@ fun LoginButton(loginEnabled: Boolean, singInEmailPassword:()->Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PasswordField(password: String, onTextFieldChanged:(String) ->Unit, isPassVisible: MutableState<Boolean>) {
+fun PasswordField(password: String, onTextFieldChanged: (String) -> Unit, isPassVisible: MutableState<Boolean>) {
 
     val visualTransformation = if (isPassVisible.value)
         VisualTransformation.None
     else PasswordVisualTransformation()
     TextField(value = password,
-        onValueChange = {onTextFieldChanged(it)},
+        onValueChange = { onTextFieldChanged(it) },
         modifier = Modifier.fillMaxWidth(),
         placeholder = { Text(text = "*********") },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -163,7 +177,7 @@ fun PasswordField(password: String, onTextFieldChanged:(String) ->Unit, isPassVi
         shape = RoundedCornerShape(15.dp),
         visualTransformation = visualTransformation,
         trailingIcon = {
-            if (password != ""){
+            if (password != "") {
                 IsPassVisibleIcon(isPassVisible)
             }
         }
@@ -173,12 +187,12 @@ fun PasswordField(password: String, onTextFieldChanged:(String) ->Unit, isPassVi
 @Composable
 fun IsPassVisibleIcon(isPassVisible: MutableState<Boolean>) {
     val icon =
-        if(isPassVisible.value)
+        if (isPassVisible.value)
             Icons.Default.VisibilityOff
         else
             Icons.Default.Visibility
-    IconButton(onClick = {isPassVisible.value = !isPassVisible.value}) {
-        Icon(imageVector = icon, contentDescription ="")
+    IconButton(onClick = { isPassVisible.value = !isPassVisible.value }) {
+        Icon(imageVector = icon, contentDescription = "")
 
     }
 
@@ -186,8 +200,10 @@ fun IsPassVisibleIcon(isPassVisible: MutableState<Boolean>) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EmailField(email: String, onTextFieldChanged:(String) ->Unit) {
-    TextField(value = email, onValueChange = {onTextFieldChanged(it)}, //Lo que se escriba en el textField se guardara en la variable text
+fun EmailField(email: String, onTextFieldChanged: (String) -> Unit) {
+    TextField(
+        value = email,
+        onValueChange = { onTextFieldChanged(it) }, //Lo que se escriba en el textField se guardara en la variable text
         modifier = Modifier.fillMaxWidth(),
         placeholder = { Text(text = "ejemplo@ejemplo.com") },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -206,12 +222,16 @@ fun EmailField(email: String, onTextFieldChanged:(String) ->Unit) {
 }
 
 @Composable
-fun HeaderImage(modifier: Modifier){
-    Image(painterResource(id = R.drawable.logo) , contentDescription ="Logo de Kollect", modifier = modifier)
+fun HeaderImage(modifier: Modifier) {
+    Image(
+        painterResource(id = R.drawable.logo),
+        contentDescription = "Logo de Kollect",
+        modifier = modifier
+    )
 }
 
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
-fun LoginPreview(){
+fun LoginPreview() {
 
 }

@@ -1,10 +1,36 @@
 package com.evasanchez.kollect.uiclasses
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 @Composable
 fun HomeScreen(navController: NavController){
+
+    val degradado = Brush.linearGradient(
+        0.0f to Color.Blue,
+        1.0f to Color.White,
+        start = Offset.Zero,
+        end = Offset.Infinite
+    )
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(degradado)) {
+        collectionScreen()
+    }
+}
+@Composable
+fun collectionScreen() {
     Text(text = "PANTALLA PRINCIPAL")
 }
