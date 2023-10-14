@@ -30,15 +30,18 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val user = auth.currentUser
-            if (user != null) {
-                startDestination = AppScreens.HomeScreen.route
-            }
-            if (user == null){
-                startDestination = AppScreens.LoginScreen.route
+            KollectTheme {
+                //Con esto, si el usuario tiene su sesión iniciada, no podrá echar para atrás hacia el login y además la app se le abrirá desde la página principal
+                val user = auth.currentUser
+                if (user != null) {
+                    startDestination = AppScreens.HomeScreen.route
+                }
+                if (user == null){
+                    startDestination = AppScreens.LoginScreen.route
 
+                }
+                AppNavigation(startDestination)
             }
-            AppNavigation(startDestination)
             }
         }
     }

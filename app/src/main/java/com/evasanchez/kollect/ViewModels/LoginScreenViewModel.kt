@@ -40,6 +40,7 @@ class LoginScreenViewModel : ViewModel() {
     fun singInEmailPassword(email:String, password:String, homeScreen: ()-> Unit) = viewModelScope.launch{
         try {
             auth.signInWithEmailAndPassword(email, password).addOnCompleteListener{ task->
+                if (task.isComplete)
                 if (task.isSuccessful){
                     Log.d("Kollect", "Iniciando sesion correctamente....")
                     homeScreen()
