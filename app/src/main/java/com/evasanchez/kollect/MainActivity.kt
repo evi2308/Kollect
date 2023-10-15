@@ -17,7 +17,6 @@ import com.evasanchez.kollect.ViewModels.LoginScreenViewModel
 import com.evasanchez.kollect.navigation.AppNavigation
 import com.evasanchez.kollect.navigation.AppScreens
 import com.evasanchez.kollect.ui.theme.KollectTheme
-import com.evasanchez.kollect.uiclasses.LoginPreview
 import com.evasanchez.kollect.uiclasses.LoginScreen
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -30,15 +29,18 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val user = auth.currentUser
-            if (user != null) {
-                startDestination = AppScreens.HomeScreen.route
-            }
-            if (user == null){
-                startDestination = AppScreens.LoginScreen.route
+            KollectTheme {
+                //Con esto, si el usuario tiene su sesión iniciada, no podrá echar para atrás hacia el login y además la app se le abrirá desde la página principal
+                val user = auth.currentUser
+                if (user != null) {
+                    startDestination = AppScreens.HomeScreen.route
+                }
+                if (user == null){
+                    startDestination = AppScreens.LoginScreen.route
 
+                }
+                AppNavigation(startDestination)
             }
-            AppNavigation(startDestination)
             }
         }
     }

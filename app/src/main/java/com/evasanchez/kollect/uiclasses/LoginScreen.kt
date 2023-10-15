@@ -15,6 +15,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -63,13 +64,20 @@ fun LoginScreen(navController: NavController, viewModel: LoginScreenViewModel) {
 
 @Composable
 fun Login(modifier: Modifier, viewModel: LoginScreenViewModel, navController: NavController) {
-
+    //Variables para guardar los estados de los TextView
     val email: String by viewModel.email.observeAsState(initial = "")
     val password: String by viewModel.password.observeAsState(initial = "")
     val isPassVisible = rememberSaveable {
         mutableStateOf(false)
     }
     val loginEnabled: Boolean by viewModel.loginEnabled.observeAsState(initial = false)
+
+    //Variables para guardar estado de los errores para mostrar los AlertDialog
+    val errorMessage = viewModel.errorMessage.observeAsState("").value
+
+    // Observa si se debe mostrar el AlertDialog
+    val showErrorDialog = viewModel.showErrorDialog.observeAsState(false).value
+
 
     Column(modifier = modifier) {
         HeaderImage(Modifier.align(Alignment.CenterHorizontally))
@@ -86,7 +94,7 @@ fun Login(modifier: Modifier, viewModel: LoginScreenViewModel, navController: Na
                 .padding(2.dp)
         ) {
             RegisterButton(navController)
-            LoginButton(loginEnabled) {
+            LoginButton(loginEnabled){
                 viewModel.singInEmailPassword(email, password) {
                     navController.navigate(AppScreens.HomeScreen.route)
                 }
@@ -94,6 +102,11 @@ fun Login(modifier: Modifier, viewModel: LoginScreenViewModel, navController: Na
 
         }
     }
+   /* if (viewModel.showErrorDialog.observeAsState(initial = false).value){
+        AlertDialog(
+            onDismissRequest = {viewModel.onDismissErrorDialog()}
+        )
+    }*/
 
 }
 
@@ -136,6 +149,7 @@ fun LoginButton(loginEnabled: Boolean, singInEmailPassword: () -> Unit) {
         onClick = {
             if (loginEnabled) {
                 singInEmailPassword()
+
             }
         },
         modifier = Modifier
@@ -230,8 +244,3 @@ fun HeaderImage(modifier: Modifier) {
     )
 }
 
-@Preview(showSystemUi = true, showBackground = true)
-@Composable
-fun LoginPreview() {
-
-}

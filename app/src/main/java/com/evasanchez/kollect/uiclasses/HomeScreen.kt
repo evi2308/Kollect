@@ -16,17 +16,9 @@ import androidx.navigation.NavController
 
 @Composable
 fun HomeScreen(navController: NavController){
-
-    val degradado = Brush.linearGradient(
-        0.0f to Color.Blue,
-        1.0f to Color.White,
-        start = Offset.Zero,
-        end = Offset.Infinite
-    )
     Box(
         Modifier
-            .fillMaxSize()
-            .background(degradado)) {
+            .fillMaxSize()) {
         collectionScreen()
     }
 }

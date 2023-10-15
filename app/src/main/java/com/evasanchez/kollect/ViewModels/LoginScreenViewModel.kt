@@ -26,6 +26,11 @@ class LoginScreenViewModel : ViewModel() {
     val loginEnabled : LiveData<Boolean> = _loginEnabled
 
 
+    private val _errorMessage = MutableLiveData<String>()
+    val errorMessage: LiveData<String> = _errorMessage
+    private val _showErrorDialog = MutableLiveData<Boolean>()
+    val showErrorDialog: LiveData<Boolean> = _showErrorDialog
+
     fun onLoginChanged(email: String, password: String){
         _email.value = email
         _password.value = password
@@ -38,7 +43,7 @@ class LoginScreenViewModel : ViewModel() {
 
 
     fun singInEmailPassword(email:String, password:String, homeScreen: ()-> Unit) = viewModelScope.launch{
-        try {
+    /*    try {
             auth.signInWithEmailAndPassword(email, password).addOnCompleteListener{ task->
                 if (task.isSuccessful){
                     Log.d("Kollect", "Iniciando sesion correctamente....")
@@ -50,6 +55,18 @@ class LoginScreenViewModel : ViewModel() {
             }
         }catch (ex:Exception){
             Log.d("Kollect", "Error ${ex.message}")
+        }*/
+
+        try{
+            auth.signInWithEmailAndPassword(email, password).addOnSuccessListener {
+                Log.d("Kollect", "Iniciando sesion correctamente....")
+                homeScreen()
+            }.addOnFailureListener(){
+                Log.d("Excepcion", "El error ha sido: ${it}")
+
+            }
+        }catch(ex:Exception){
+
         }
     }
 }

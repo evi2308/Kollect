@@ -9,6 +9,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.evasanchez.kollect.uiclasses.LoginScreen
 import kotlinx.coroutines.launch
 
 class RegisterScreenViewModel: ViewModel() {
@@ -38,13 +39,13 @@ class RegisterScreenViewModel: ViewModel() {
     private fun isValidPassword(password: String): Boolean = password.length > 8
     private fun isValidEmail(email: String): Boolean = Patterns.EMAIL_ADDRESS.matcher(email).matches()
 
-    fun singInEmailPassword(email: String, password: String, homeScreen: () -> Unit) =
+    fun createUserEmailPassword(email: String, password: String, LoginScreen: () -> Unit) =
         viewModelScope.launch {
             try {
                 auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         Log.d("Kollect", "Cuenta creada e Iniciando sesion correctamente....")
-                        homeScreen()
+                        LoginScreen()
                     } else {
                         Log.d("Kollect", "${task.result.toString()}")
                     }
