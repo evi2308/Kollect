@@ -81,8 +81,11 @@ fun Register(modifier: Modifier, navController: NavController, viewModel: Regist
         )
         Spacer(modifier = Modifier.padding(4.dp))
         RegistrarButton(loginEnabled) {
-            viewModel.singInEmailPassword(email, password) {
-                navController.navigate(AppScreens.HomeScreen.route)
+            viewModel.createUserEmailPassword(email, password) {
+                navController.navigate(AppScreens.LoginScreen.route)
+                if (navController.previousBackStackEntry?.destination?.route == AppScreens.RegisterScreen.route) {
+                    navController.popBackStack(AppScreens.RegisterScreen.route, inclusive = true)
+                }
             }
         }
 
@@ -91,11 +94,12 @@ fun Register(modifier: Modifier, navController: NavController, viewModel: Regist
 }
 
 @Composable
-fun RegistrarButton(loginEnabled: Boolean, signInEmailPassword: () -> Unit) {
+fun RegistrarButton(loginEnabled: Boolean, createUserEmailPassword: () -> Unit) {
     Button(
         onClick = {
             if (loginEnabled) {
-                signInEmailPassword()
+                createUserEmailPassword()
+
             }
         },
         modifier = Modifier

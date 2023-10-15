@@ -17,7 +17,6 @@ import com.evasanchez.kollect.ViewModels.LoginScreenViewModel
 import com.evasanchez.kollect.navigation.AppNavigation
 import com.evasanchez.kollect.navigation.AppScreens
 import com.evasanchez.kollect.ui.theme.KollectTheme
-import com.evasanchez.kollect.uiclasses.LoginPreview
 import com.evasanchez.kollect.uiclasses.LoginScreen
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
