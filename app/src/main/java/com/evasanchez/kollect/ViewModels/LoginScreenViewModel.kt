@@ -12,6 +12,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import com.evasanchez.kollect.navigation.AppNavigation
+import com.google.firebase.auth.FirebaseAuthException
 
 class LoginScreenViewModel : ViewModel() {
     private val auth: FirebaseAuth = Firebase.auth
@@ -62,11 +63,31 @@ class LoginScreenViewModel : ViewModel() {
                 Log.d("Kollect", "Iniciando sesion correctamente....")
                 homeScreen()
             }.addOnFailureListener(){
+                var errorAuthText = ""
                 Log.d("Excepcion", "El error ha sido: ${it}")
+                when ((it as? FirebaseAuthException)?.errorCode) {
+                    "INVALID_LOGIN_CREDENTIALS" -> {
+                        errorAuthText = "Email o contraseña incorrectas."
+                    }
+                    "ERROR_USER_NOT_FOUND" -> {
+                        errorAuthText = "Este usuario no existe ${it.message}"
+                    }
+                    // Error generico
+                    else -> {
+                        errorAuthText = "Algo ha salido mal, inténtelo de nuevo más tarde ${it.message}"
+                    }
+                }
+                val errorMessage = "Error de inicio de sesion ${it.message}"
+                _errorMessage.postValue(errorAuthText)
+                _showErrorDialog.postValue(true)
 
             }
         }catch(ex:Exception){
 
         }
+    }
+
+    fun onDismissErrorDialog() {
+        _showErrorDialog.value = false
     }
 }

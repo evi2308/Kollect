@@ -236,51 +236,5 @@ fun PasswordRegister(modifier: Modifier,password: String, onTextFieldChanged: (S
 }
 
 
-/*
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun emailRegisterTextField() {
-    TextField(value = "", onValueChange = {},
-        modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text(text = "ejemplo@ejemplo.com") },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-        singleLine = true,
-        maxLines = 1,
-        colors = TextFieldDefaults.textFieldColors(
-            textColor = Color(0xFFFFFFFF),
-            containerColor = Color(0xFFF1D5DB),
-            placeholderColor = Color(0xFFFFFFFF),
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent
-        ),
-        shape = RoundedCornerShape(15.dp)
-    )
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun PasswordRegisterTextField() {
-    TextField(
-        value = "", onValueChange = {},
-        modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text(text = "*********") },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        singleLine = true,
-        maxLines = 1,
-        colors = TextFieldDefaults.textFieldColors(
-            textColor = Color(0xFFFFFFFF),
-            containerColor = Color(0xFFF1D5DB),
-            placeholderColor = Color(0xFFFFFFFF),
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent
-        ),
-        shape = RoundedCornerShape(15.dp)
-    )
-}}
-*/
-
 
 
