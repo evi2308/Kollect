@@ -98,6 +98,9 @@ fun Login(modifier: Modifier, viewModel: LoginScreenViewModel, navController: Na
             LoginButton(loginEnabled){
                 viewModel.singInEmailPassword(email, password) {
                     navController.navigate(AppScreens.HomeScreen.route)
+                    if (navController.previousBackStackEntry?.destination?.route == AppScreens.LoginScreen.route) {
+                        navController.popBackStack(AppScreens.LoginScreen.route, inclusive = true)
+                    }
                 }
             }
 
