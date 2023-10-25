@@ -38,7 +38,7 @@ class RegisterScreenViewModel: ViewModel() {
     }
 
 
-    private fun isValidPassword(password: String): Boolean = password.length > 8
+    private fun isValidPassword(password: String): Boolean = password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#\\$%^&+=])(?=\\S+\$).{8,}\$".toRegex())
     private fun isValidEmail(email: String): Boolean = Patterns.EMAIL_ADDRESS.matcher(email).matches()
 
     fun createUserEmailPassword(email: String, password: String, loginScreen: () -> Unit) =
@@ -48,6 +48,7 @@ class RegisterScreenViewModel: ViewModel() {
                     if (task.isSuccessful) {
                         Log.d("Kollect", "Cuenta creada e Iniciando sesion correctamente....")
                         addUserNameToDB()
+                        auth.signOut()
                         loginScreen()
                     } else {
                         Log.d("Kollect", "${task.result}")

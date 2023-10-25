@@ -39,7 +39,7 @@ class LoginScreenViewModel : ViewModel() {
     }
 
 
-    private fun isValidPassword(password: String): Boolean = password.length>8
+    private fun isValidPassword(password: String): Boolean = password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#\\$%^&+=])(?=\\S+\$).{8,}\$".toRegex())
     private fun isValidEmail(email: String): Boolean = Patterns.EMAIL_ADDRESS.matcher(email).matches()
 
 

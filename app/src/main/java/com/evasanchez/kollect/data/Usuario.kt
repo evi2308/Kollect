@@ -31,12 +31,16 @@ data class Usuario(
 data class Kgroups(
     val groupId: String,
     val groupName: String
-)
+){
+
+}
 
 data class Idols(
     val idolId: String,
     val idolName: String
-)
+){
+
+}
 
 data class Wishlist(
     val photocardId: String,
@@ -48,7 +52,9 @@ data class Wishlist(
     val type: String,
     val photocardURL: String,
     val photocardVersion: String
-)
+){
+
+}
 
 data class Coleccion(
     val photocardId: String,
@@ -60,5 +66,7 @@ data class Coleccion(
     val type: String,
     val photocardURL: String,
     val photocardVersion: String
-)
+){
+
+}
 
