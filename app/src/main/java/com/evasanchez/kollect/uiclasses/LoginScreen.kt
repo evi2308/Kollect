@@ -22,6 +22,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -38,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -176,7 +178,36 @@ fun PasswordField(password: String, onTextFieldChanged: (String) -> Unit, isPass
     val visualTransformation = if (isPassVisible.value)
         VisualTransformation.None
     else PasswordVisualTransformation()
-    TextField(value = password,
+
+    OutlinedTextField(
+        value = password,
+        onValueChange = { onTextFieldChanged(it) },
+        placeholder = { Text(text = "*********") },
+        modifier = Modifier.fillMaxWidth(),
+        textStyle = TextStyle(color = Color.Black),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        singleLine = true,
+        maxLines = 1,
+        label = { Text("Contraseña") },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            textColor = Color(0xFFFFFFFF),
+            placeholderColor = Color(0xFFFFFFFF),
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+
+            //focusedIndicatorColor = Color.Transparent,
+            //unfocusedIndicatorColor = Color.Transparent,
+            //disabledIndicatorColor = Color.Transparent
+        ),
+        shape = RoundedCornerShape(15.dp),
+        visualTransformation = visualTransformation,
+        trailingIcon = {
+            if (password != "") {
+                IsPassVisibleIcon(isPassVisible)
+            }
+        }
+    )
+    /*TextField(value = password,
         onValueChange = { onTextFieldChanged(it) },
         modifier = Modifier.fillMaxWidth(),
         placeholder = { Text(text = "*********") },
@@ -199,7 +230,7 @@ fun PasswordField(password: String, onTextFieldChanged: (String) -> Unit, isPass
                 IsPassVisibleIcon(isPassVisible)
             }
         }
-    )
+    )*/
 }
 
 @Composable
@@ -219,7 +250,7 @@ fun IsPassVisibleIcon(isPassVisible: MutableState<Boolean>) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmailField(email: String, onTextFieldChanged: (String) -> Unit) {
-    TextField(
+   /* TextField(
         value = email,
         onValueChange = { onTextFieldChanged(it) }, //Lo que se escriba en el textField se guardara en la variable text
         modifier = Modifier.fillMaxWidth(),
@@ -234,6 +265,29 @@ fun EmailField(email: String, onTextFieldChanged: (String) -> Unit) {
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent
+        ),
+        shape = RoundedCornerShape(15.dp)
+    )*/
+
+    OutlinedTextField(
+        value = email,
+        onValueChange = { onTextFieldChanged(it) },
+        modifier = Modifier.fillMaxWidth(),//Lo que se escriba en el textField se guardara
+        placeholder = { Text("ejemplo@ejemplo.com") },
+        textStyle = TextStyle(color = Color.Black),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+        singleLine = true,
+        maxLines = 1,
+        label = { Text("E-mail") },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            textColor = Color(0xFFFFFFFF),
+            placeholderColor = Color(0xFFFFFFFF),
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+
+            //focusedIndicatorColor = Color.Transparent,
+            //unfocusedIndicatorColor = Color.Transparent,
+            //disabledIndicatorColor = Color.Transparent
         ),
         shape = RoundedCornerShape(15.dp)
     )
