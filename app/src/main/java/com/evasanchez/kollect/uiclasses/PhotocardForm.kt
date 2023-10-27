@@ -33,12 +33,12 @@ fun PhotocardForm(navController: NavController, viewModel: PhotocardFormViewMode
 }
 @Composable
 fun photocards(modifier: Modifier, viewModel: PhotocardFormViewModel, navController: NavController){
-    AlbumName(modifier)
+    AlbumNameTextField(modifier)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AlbumName(modifier: Modifier) {
+fun AlbumNameTextField(modifier: Modifier) {
     Column(modifier = modifier) {
         Text(
             text = "¿A qué álbum pertenece ésta photocard?",
@@ -55,6 +55,37 @@ fun AlbumName(modifier: Modifier) {
             singleLine = true,
             maxLines = 1,
             label = { Text(text= "username") },
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                textColor = Color(0xFFFFFFFF),
+                placeholderColor = Color(0xFFFFFFFF),
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.primary
+            ),
+            shape = RoundedCornerShape(15.dp)
+        )
+    }
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ValueTextField(modifier: Modifier) {
+    Column(modifier = modifier) {
+        Text(
+            text = "¿Cuál es el valor de la photocard?",
+            textAlign = TextAlign.Left,
+            color = Color(0xFF7D5260),
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(8.dp)
+        )
+        OutlinedTextField(
+            value = "value",
+            onValueChange = { },
+            placeholder = { Text(text = "value") },
+            textStyle = TextStyle(color = Color.Black),
+            singleLine = true,
+            maxLines = 1,
+            label = { Text(text = "username") },
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 textColor = Color(0xFFFFFFFF),
                 placeholderColor = Color(0xFFFFFFFF),

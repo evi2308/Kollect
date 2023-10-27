@@ -37,7 +37,8 @@ data class Kgroups(
 
 data class Idols(
     val idolId: String,
-    val idolName: String
+    val idolName: String,
+    val groupName2: String
 ){
 
 }

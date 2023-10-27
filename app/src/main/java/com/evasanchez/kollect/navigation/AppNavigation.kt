@@ -9,6 +9,7 @@ import com.evasanchez.kollect.ViewModels.PhotocardFormViewModel
 import com.evasanchez.kollect.ViewModels.RegisterScreenViewModel
 import com.evasanchez.kollect.uiclasses.HomeScreen
 import com.evasanchez.kollect.uiclasses.LoginScreen
+import com.evasanchez.kollect.uiclasses.MyProfileScreen
 import com.evasanchez.kollect.uiclasses.PhotocardForm
 import com.evasanchez.kollect.uiclasses.RegisterScreen
 
@@ -27,6 +28,9 @@ fun AppNavigation(startDestination : String){
         }
         composable(route = AppScreens.PhotocardForm.route){
             PhotocardForm(navController, viewModel = PhotocardFormViewModel())
+        }
+        composable(route = AppScreens.ProfileScreen.route){
+            MyProfileScreen(navController)
         }
     }
 }
