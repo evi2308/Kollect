@@ -13,6 +13,7 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import com.evasanchez.kollect.navigation.AppNavigation
 import com.google.firebase.auth.FirebaseAuthException
+import kotlinx.coroutines.delay
 
 class LoginScreenViewModel : ViewModel() {
     private val auth: FirebaseAuth = Firebase.auth
@@ -45,19 +46,19 @@ class LoginScreenViewModel : ViewModel() {
 
 
     fun singInEmailPassword(email:String, password:String, homeScreen: ()-> Unit) = viewModelScope.launch{
-    /*    try {
-            auth.signInWithEmailAndPassword(email, password).addOnCompleteListener{ task->
-                if (task.isSuccessful){
-                    Log.d("Kollect", "Iniciando sesion correctamente....")
-                    homeScreen()
+        /*    try {
+                auth.signInWithEmailAndPassword(email, password).addOnCompleteListener{ task->
+                    if (task.isSuccessful){
+                        Log.d("Kollect", "Iniciando sesion correctamente....")
+                        homeScreen()
+                    }
+                    else{
+                        Log.d("Kollect", "${task.result.toString()}")
+                    }
                 }
-                else{
-                    Log.d("Kollect", "${task.result.toString()}")
-                }
-            }
-        }catch (ex:Exception){
-            Log.d("Kollect", "Error ${ex.message}")
-        }*/
+            }catch (ex:Exception){
+                Log.d("Kollect", "Error ${ex.message}")
+            }*/
 
         try{
             auth.signInWithEmailAndPassword(email, password).addOnSuccessListener {

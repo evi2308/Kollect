@@ -1,5 +1,6 @@
 package com.evasanchez.kollect.uiclasses
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -51,15 +53,29 @@ import com.evasanchez.kollect.R
 import com.evasanchez.kollect.ViewModels.LoginScreenViewModel
 import com.evasanchez.kollect.navigation.AppScreens
 
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavController, viewModel: LoginScreenViewModel) {
-    Box(
-        Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Login(Modifier.align(Alignment.Center), viewModel, navController)
-    }
+
+    Scaffold(
+        content = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
+                Login(Modifier.align(Alignment.Center),viewModel, navController)}
+            }
+
+        })
+
 }
 
 @Composable
@@ -100,9 +116,6 @@ fun Login(modifier: Modifier, viewModel: LoginScreenViewModel, navController: Na
             LoginButton(loginEnabled){
                 viewModel.singInEmailPassword(email, password) {
                     navController.navigate(AppScreens.HomeScreen.route)
-                    if (navController.previousBackStackEntry?.destination?.route == AppScreens.LoginScreen.route) {
-                        navController.popBackStack(AppScreens.LoginScreen.route, inclusive = true)
-                    }
                 }
             }
 

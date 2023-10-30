@@ -76,7 +76,7 @@ fun BottomNavigationBar(navController : NavController) {
                 onClick = {
                     selectedItemIndex = index
                     navController.navigate(item.navRoute)
-                          },
+                },
                 label = { Text(item.title)},
                 icon = {
                     Icon(

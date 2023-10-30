@@ -69,9 +69,8 @@ class RegisterScreenViewModel: ViewModel() {
             try {
                 auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Log.d("Kollect", "Cuenta creada e Iniciando sesion correctamente....")
-                        addUserNameToDB()
-                        auth.signOut()
+                        Log.d("Kollect", "Cuenta creada....")
+                        createUser()
                         loginScreen()
                     } else {
                         Log.d("Kollect", "${task.result}")
@@ -82,16 +81,32 @@ class RegisterScreenViewModel: ViewModel() {
             }
         }
 
-    fun addUserNameToDB(){
+    fun createUser(){
+        val currentuserid = auth.currentUser?.uid
+        val user = Usuario(
+            email = email.value.toString(),
+            username = username.value.toString(),
+            userId = currentuserid.toString()
+        ).userToMap()
+        FirebaseFirestore.getInstance().collection("usuario").add(user)
+            .addOnSuccessListener {
+            Log.d("AÑADIDO", "ESTO HA FUNCADO")
+        }.addOnFailureListener{
+            Log.d("NO AÑADIDO", "Esto es una mierda")
+        }
+    }
+    private fun addUserNameToDB(){
+        val userid = auth.currentUser?.uid
         val userDataRegister = Usuario(
             email = email.value.toString(),
-            username = username.value.toString()
+            username = username.value.toString(),
+            userId = userid.toString()
 
         ).userToMap()
 
         FirebaseFirestore.getInstance().collection("usuario").add(userDataRegister)
             .addOnSuccessListener {
-                Log.d("Kollect", "Usuario creado correctamente")
+                Log.d("Kollect", "Usuario añadido a la base de datos")
             }
             .addOnFailureListener{
                 Log.d("Kollect", "Algo ha salido mal")

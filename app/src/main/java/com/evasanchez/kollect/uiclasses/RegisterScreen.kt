@@ -99,12 +99,11 @@ fun RegistrarButton(loginEnabled: Boolean, createUserEmailPassword: () -> Unit) 
         onClick = {
             if (loginEnabled) {
                 createUserEmailPassword()
-
             }
         },
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp),
+            .height(40.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0xFFF1D5DB),
             disabledContainerColor = Color(0xFF7D5260)

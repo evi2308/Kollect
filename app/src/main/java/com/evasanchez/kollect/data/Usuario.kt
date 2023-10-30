@@ -7,10 +7,10 @@ data class Usuario(
     val pfpURL: String = "",
     val contPcs: String = "",
     val valuePcs: String = "",
-    val wishlist: List<Wishlist> = emptyList(),
+   /* val wishlist: List<Wishlist> = emptyList(),
     val coleccion: List<Coleccion> = emptyList(),
     val kgroups: List<Kgroups> = emptyList(),
-    val idols: List<Idols> = emptyList()
+    val idols: List<Idols> = emptyList() */
 ) {
     fun userToMap(): MutableMap<String, Any>{
         return mutableMapOf(
@@ -20,10 +20,10 @@ data class Usuario(
             "pfpURL" to this.pfpURL,
             "cont_pcs" to this.contPcs,
             "valuePcs" to this.valuePcs,
-            "wishlist" to this.wishlist,
+            /*"wishlist" to this.wishlist,
             "coleccion" to this.coleccion,
             "kgroups" to this.kgroups,
-            "idols" to this.idols
+            "idols" to this.idols*/
         )
     }
 }

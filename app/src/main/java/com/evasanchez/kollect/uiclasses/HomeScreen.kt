@@ -2,8 +2,14 @@ package com.evasanchez.kollect.uiclasses
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -41,25 +47,23 @@ import com.evasanchez.kollect.navigation.AppScreens
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController){
-
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(onClick = {
+fun HomeScreen(navController: NavController) {
+    
+    Column(modifier = Modifier.padding(8.dp), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Bottom) {
+        FloatingActionButton(
+            onClick = {
                 navController.navigate(AppScreens.PhotocardForm.route)
-            }) {
-                Icon(Icons.Filled.Add, "Añadir photocard")
-            }
-        },
-        bottomBar = {
-            BottomNavigationBar(navController)
-        },
-        // Defaults to FabPosition.End
-        floatingActionButtonPosition = FabPosition.End
-    ) {
-        collectionScreen()
+            },
 
+        ) {
+            Icon(Icons.Filled.Add, "Añadir photocard")
+        }
+        collectionScreen()
     }
+
+
+
+
 }
 @Composable
 fun collectionScreen() {
