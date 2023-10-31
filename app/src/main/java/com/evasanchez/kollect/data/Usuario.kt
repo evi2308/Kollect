@@ -28,8 +28,7 @@ data class Usuario(
     }
 }
 
-data class Kgroups(
-    val groupId: String,
+data class KgroupsItem(
     val groupName: String
 ){
 

@@ -35,5 +35,6 @@ fun AppNavigation(startDestination : String, navController: NavHostController){
         composable(route = AppScreens.ProfileScreen.route){
             MyProfileScreen(navController, viewModel = ProfileScreenViewModel())
         }
+
     }
 }

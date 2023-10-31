@@ -10,4 +10,6 @@ sealed class AppScreens(val route: String){
 
     object ProfileScreen: AppScreens("profile_screen")
 
+    object KGroupListComponent: AppScreens("dropdown_screen")
+
 }

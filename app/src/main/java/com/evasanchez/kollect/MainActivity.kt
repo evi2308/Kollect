@@ -19,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,6 +50,7 @@ import com.evasanchez.kollect.uiclasses.MyProfileScreen
 import com.evasanchez.kollect.uiclasses.PhotocardForm
 import com.evasanchez.kollect.uiclasses.RegisterScreen
 import com.evasanchez.kollect.uiclasses.collectionScreen
+import com.google.firebase.FirebaseApp
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
@@ -56,7 +58,7 @@ class MainActivity : ComponentActivity() {
     var startDestination = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        FirebaseApp.initializeApp(this)
         setContent {
             KollectTheme {
                 val navController = rememberNavController()
