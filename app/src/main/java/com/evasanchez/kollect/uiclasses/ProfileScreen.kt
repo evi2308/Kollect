@@ -44,7 +44,7 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
     val kGroup: String by viewModel.kGroup.observeAsState(initial = "")
     val idol: String by viewModel.idol.observeAsState(initial = "")
     val kGroups : List<String> by viewModel.allGroups.observeAsState(initial = listOf())
-
+    var selectedKGroup by remember { mutableStateOf(if (kGroups.isNotEmpty()) kGroups[0] else "") }
     LaunchedEffect(viewModel) {
         viewModel.addKgroupToUser(kGroup)
     }
@@ -54,15 +54,25 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
             Spacer(Modifier.padding(16.dp))
             Text(text = "Añade un Idol a tu colección",
                 modifier = Modifier.fillMaxWidth())
-            KgroupExposedDropdownMenuBox(kGroups)
-            addIdolTextField (viewModel,idol, {viewModel.onIdolChanged(it)})
+            KgroupExposedDropdownMenuBox(kGroups){ selectedText ->
+                selectedKGroup = selectedText
+            }
+            addIdolTextField (viewModel,idol, {viewModel.onIdolChanged(it)}, selectedKGroup) {selectedKGroup, idolText ->
+                viewModel.addIdolToUser(selectedKGroup, idolText)
+            }
             
 
 
         }
     }
 @Composable
-fun addIdolTextField(viewModel: ProfileScreenViewModel,idol: String, onIdolChanged: (String) -> Unit) {
+fun addIdolTextField(
+    viewModel: ProfileScreenViewModel,
+    idol: String,
+    onIdolChanged: (String) -> Unit,
+    selectedKGroup: String,
+    addIdolToUser: (String, String) -> Unit
+) {
     var isButtonEnabled by remember { mutableStateOf(false) }
     OutlinedTextField(
         value = idol,
@@ -87,7 +97,7 @@ fun addIdolTextField(viewModel: ProfileScreenViewModel,idol: String, onIdolChang
     ElevatedButton(
         onClick = {
             Log.d("Hola", "El boton hace click")
-            //addIdolToUser(selectedText,idol)
+            addIdolToUser(selectedKGroup,idol)
 
         },
         modifier = Modifier
@@ -140,7 +150,7 @@ fun AddKGroup(viewModel: ProfileScreenViewModel, kGroup: String, onKgroupChanged
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun KgroupExposedDropdownMenuBox(kGroups: List<String>) {
+fun KgroupExposedDropdownMenuBox(kGroups: List<String>, onItemSelected: (String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     var selectedText by remember {  mutableStateOf(if (kGroups.isNotEmpty()) kGroups[0] else "") }
 
@@ -173,6 +183,7 @@ fun KgroupExposedDropdownMenuBox(kGroups: List<String>) {
                         text = { Text(text = item) },
                         onClick = {
                             selectedText = item
+                            onItemSelected(item)
                             expanded = false
                         }
                     )
