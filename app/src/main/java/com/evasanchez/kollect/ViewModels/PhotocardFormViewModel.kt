@@ -51,14 +51,17 @@ class PhotocardFormViewModel: ViewModel() {
     private val _allGroups = MutableLiveData<List<String>>()
     val allGroups: LiveData<List<String>> = _allGroups
 
- private val _allIdols = MutableLiveData<List<String>>()
- val allIdols: LiveData<List<String>> = _allIdols
+    private val _allIdols = MutableLiveData<List<String>>()
+    val allIdols: LiveData<List<String>> = _allIdols
+
  init {
   Log.d("A ver", "Entra en el init")
   val db = FirebaseFirestore.getInstance()
   db.firestoreSettings = FirebaseFirestoreSettings.Builder().build()
   viewModelScope.launch {
    getKGroupListRepository()
+   val selectedGroup = ""
+   getIdolsBasedOnKgroup(selectedGroup)
    Log.d("PAAAA", allGroups.value.toString())  }
 
  }
@@ -72,6 +75,19 @@ class PhotocardFormViewModel: ViewModel() {
    val documentSnapshot = querySnapshot.documents.first()
    val documentPath = documentSnapshot.reference.path
    return db.document(documentPath).collection("Kgroups")
+  } else {
+   throw NoSuchElementException("User not found")
+  }
+ }
+ suspend fun getIdolSubColReference(userId: String): CollectionReference {
+  val usersCollection = db.collection("usuario")
+  val query = usersCollection.whereEqualTo("user_id", userId)
+  val querySnapshot = query.get().await()
+
+  if (!querySnapshot.isEmpty) {
+   val documentSnapshot = querySnapshot.documents.first()
+   val documentPath = documentSnapshot.reference.path
+   return db.document(documentPath).collection("Idols")
   } else {
    throw NoSuchElementException("User not found")
   }
@@ -107,6 +123,35 @@ class PhotocardFormViewModel: ViewModel() {
   }
  }
 
+ fun getIdolsBasedOnKgroup(selectedGroup: String) {
+  viewModelScope.launch(Dispatchers.IO) {
+   val subColReference = userID?.let { getIdolSubColReference(it) }
+
+   if (subColReference != null) {
+    try {
+     val idolsQuery = subColReference.whereEqualTo("group_name", selectedGroup).get().await()
+     val idolsNames = mutableListOf<String>()
+
+     for (document in idolsQuery) {
+      val name = document.getString("idol_name") // Assuming idol_name is the field you want to retrieve
+      if (name != null) {
+       Log.d("Hostia", name)
+       idolsNames.add(name)
+      }
+     }
+
+     _allIdols.postValue(idolsNames)
+    } catch (e: Exception) {
+     Log.e("Firestore Query Error", e.message ?: "Unknown error")
+     _allIdols.postValue(emptyList())
+    }
+   } else {
+    Log.d("Else", "subColReference is null")
+    _allIdols.postValue(emptyList())
+   }
+  }
+ }
+ }
 
 
-}
+

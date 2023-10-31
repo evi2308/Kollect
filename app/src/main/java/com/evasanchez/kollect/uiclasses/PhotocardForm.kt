@@ -15,12 +15,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -44,9 +49,14 @@ import com.google.android.gms.auth.api.phone.SmsCodeAutofillClient.PermissionSta
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhotocardForm(navController: NavController, viewModel: PhotocardFormViewModel){
-    val kGroupsList : List<String> by viewModel.allGroups.observeAsState(initial = listOf())
+    val idolsList : List<String> by viewModel.allIdols.observeAsState(initial = listOf())
     val kGroups : List<String> by viewModel.allGroups.observeAsState(initial = listOf())
     var selectedKGroup by remember { mutableStateOf(if (kGroups.isNotEmpty()) kGroups[0] else "") }
+    var selectedIdol by remember { mutableStateOf(if (idolsList.isNotEmpty()) idolsList[0] else "") }
+    LaunchedEffect(viewModel) {
+        viewModel.getKGroupListRepository()
+        viewModel.getIdolsBasedOnKgroup(selectedKGroup)
+    }
     Box(
         Modifier
             .fillMaxSize()
@@ -55,14 +65,20 @@ fun PhotocardForm(navController: NavController, viewModel: PhotocardFormViewMode
         Column(Modifier.align(Alignment.Center)) {
             AlbumNameTextField()
             SelectPhotocardImage()
-            KgroupExposedDropdownMenuBox(kGroups){ selectedText ->
+
+            KgroupExposedDropdownMenuBoxRelatedToIdol(kGroups){ selectedText ->
                 selectedKGroup = selectedText
+                viewModel.getIdolsBasedOnKgroup(selectedText)
+            }
+            IdolExposedDropdownMenuBox(idolsList){
+                    selectedText ->
+                    selectedIdol = selectedText
+            }
             }
             ValueTextField()
         }
 
     }
-}
 
 @Composable
 fun SelectPhotocardImage() {
@@ -150,5 +166,50 @@ fun ValueTextField() {
             shape = RoundedCornerShape(15.dp),
             modifier = Modifier.fillMaxWidth()
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun KgroupExposedDropdownMenuBoxRelatedToIdol(kGroups: List<String>, onItemSelected: (String) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedText by remember {  mutableStateOf(if (kGroups.isNotEmpty()) kGroups[0] else "") }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(32.dp)
+    ) {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = {
+                expanded = !expanded
+            }
+        ) {
+            TextField(
+                value = selectedText,
+                label= { Text(text = "Selecciona un grupo")},
+                placeholder = {Text(text = "Selecciona un grupo")},
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier.menuAnchor()
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                kGroups.forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text(text = item) },
+                        onClick = {
+                            selectedText = item
+                            onItemSelected(item)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
     }
 }
