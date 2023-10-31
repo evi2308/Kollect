@@ -2,6 +2,7 @@ package com.evasanchez.kollect
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
@@ -63,20 +64,21 @@ class MainActivity : ComponentActivity() {
             KollectTheme {
                 val navController = rememberNavController()
                 //Con esto, si el usuario tiene su sesión iniciada, no podrá echar para atrás hacia el login y además la app se le abrirá desde la página principal
-                val user = auth.currentUser
-                if (user != null) {
-                    startDestination = AppScreens.HomeScreen.route
-                }
-                if (user == null){
-                    startDestination = AppScreens.LoginScreen.route
 
+                if (auth.getCurrentUser() != null){
+                    Log.d("Autenticacion", "El usuario es: ${auth.currentUser?.email}")
+                    startDestination = AppScreens.HomeScreen.route
+                }else{
+                    Log.d("Autenticacion", "No hay usuario")
+                    startDestination = AppScreens.LoginScreen.route
                 }
+
                 var showBottomBar by rememberSaveable { mutableStateOf(true) }
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
 
                 showBottomBar = when (navBackStackEntry?.destination?.route) {
                     "login_screen" -> false // on this screen bottom bar should be hidden
-                    "egister_screen" -> false // here too
+                    "register_screen" -> false // here too
                     else -> true // in all other cases show bottom bar
                 }
                 Scaffold(
@@ -93,5 +95,17 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
+    }
+
+    suspend fun initApp(){
+        val user = auth.currentUser
+        if (user != null) {
+            startDestination = AppScreens.HomeScreen.route
+        }
+        if (user == null){
+            startDestination = AppScreens.LoginScreen.route
+
+        }
+
     }
 }

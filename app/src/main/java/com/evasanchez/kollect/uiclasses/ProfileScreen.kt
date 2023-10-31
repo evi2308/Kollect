@@ -23,13 +23,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,21 +52,25 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
             Text(text = "PERFIL DE USUARIO")
             AddKGroup(viewModel, kGroup,{ viewModel.onKGroupChanged(it) })  {viewModel.addKgroupToUser(kGroup)}
             Spacer(Modifier.padding(16.dp))
+            Text(text = "Añade un Idol a tu colección",
+                modifier = Modifier.fillMaxWidth())
             KgroupExposedDropdownMenuBox(kGroups)
+            addIdolTextField (viewModel,idol, {viewModel.onIdolChanged(it)})
+            
 
 
         }
     }
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddKGroup(viewModel: ProfileScreenViewModel, kGroup: String, onKgroupChanged: (String) -> Unit, addKgroupToUser:()-> Unit) {
+fun addIdolTextField(viewModel: ProfileScreenViewModel,idol: String, onIdolChanged: (String) -> Unit) {
+    var isButtonEnabled by remember { mutableStateOf(false) }
     OutlinedTextField(
-        value = kGroup,
-        onValueChange = { onKgroupChanged(it)},
+        value = idol,
+        onValueChange = { onIdolChanged(it)
+            isButtonEnabled = it.isNotBlank()},
         modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text("Kgorup") },
-        textStyle = TextStyle(color = Color.Black),
+        placeholder = { Text("Idol") },
+        textStyle = TextStyle(color = MaterialTheme.colorScheme.onPrimaryContainer),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
         singleLine = true,
         maxLines = 1,
@@ -81,6 +83,46 @@ fun AddKGroup(viewModel: ProfileScreenViewModel, kGroup: String, onKgroupChanged
         ),
         shape = RoundedCornerShape(15.dp)
     )
+    Spacer(modifier = Modifier.padding(16.dp))
+    ElevatedButton(
+        onClick = {
+            Log.d("Hola", "El boton hace click")
+            //addIdolToUser(selectedText,idol)
+
+        },
+        modifier = Modifier
+            .height(40.dp),
+        enabled = isButtonEnabled
+    ) {
+        Text(text = "Añadir")
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddKGroup(viewModel: ProfileScreenViewModel, kGroup: String, onKgroupChanged: (String) -> Unit, addKgroupToUser:()-> Unit) {
+    var isButtonEnabled by remember { mutableStateOf(false) }
+    OutlinedTextField(
+        value = kGroup,
+        onValueChange = { onKgroupChanged(it)
+            isButtonEnabled = it.isNotBlank()},
+
+        modifier = Modifier.fillMaxWidth(),
+        placeholder = { Text("Kgorup") },
+        textStyle = TextStyle(color = MaterialTheme.colorScheme.onPrimaryContainer),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+        singleLine = true,
+        maxLines = 1,
+        label = { Text("Añade un grupo a tu coleción ") },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            textColor = Color(0xFFFFFFFF),
+            placeholderColor = Color(0xFFFFFFFF),
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+        ),
+        shape = RoundedCornerShape(15.dp)
+    )
+    Spacer(modifier = Modifier.padding(16.dp))
     ElevatedButton(
         onClick = {
             Log.d("Hola", "El boton hace click")
@@ -89,6 +131,7 @@ fun AddKGroup(viewModel: ProfileScreenViewModel, kGroup: String, onKgroupChanged
     },
         modifier = Modifier
             .height(40.dp),
+        enabled = isButtonEnabled
         ) {
             Text(text = "Añadir")
     }

@@ -2,6 +2,7 @@ package com.evasanchez.kollect.ViewModels
 
 import android.util.Log
 import android.util.Patterns
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
@@ -12,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import com.evasanchez.kollect.data.Usuario
 import com.evasanchez.kollect.uiclasses.LoginScreen
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -67,14 +69,15 @@ class RegisterScreenViewModel: ViewModel() {
     fun createUserEmailPassword(email: String, password: String, loginScreen: () -> Unit) =
         viewModelScope.launch {
             try {
-                auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
+                auth.createUserWithEmailAndPassword(email, password).addOnSuccessListener { task ->
+
                         Log.d("Kollect", "Cuenta creada....")
                         createUser()
                         loginScreen()
-                    } else {
-                        Log.d("Kollect", "${task.result}")
-                    }
+
+                }.addOnFailureListener{
+                    Log.d("Error", "Error al crear cuenta")
+                    cancel()
                 }
             } catch (ex: Exception) {
                 Log.d("Kollect", "Error ${ex.message}")

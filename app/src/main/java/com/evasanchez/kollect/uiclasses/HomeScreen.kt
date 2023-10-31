@@ -27,6 +27,7 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -48,23 +49,29 @@ import com.evasanchez.kollect.navigation.AppScreens
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
-    
-    Column(modifier = Modifier.padding(8.dp), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Bottom) {
+    Scaffold {
+
         FloatingActionButton(
             onClick = {
                 navController.navigate(AppScreens.PhotocardForm.route)
             },
 
-        ) {
+
+            ) {
+
             Icon(Icons.Filled.Add, "Añadir photocard")
         }
-        collectionScreen()
+
+
+
+    }
+
     }
 
 
 
 
-}
+
 @Composable
 fun collectionScreen() {
     Text(text = "PANTALLA PRINCIPAL")

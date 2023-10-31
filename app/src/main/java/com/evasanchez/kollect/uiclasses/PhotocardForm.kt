@@ -1,9 +1,9 @@
 package com.evasanchez.kollect.uiclasses
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,25 +37,30 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
 import com.evasanchez.kollect.ViewModels.PhotocardFormViewModel
+import com.google.android.gms.auth.api.phone.SmsCodeAutofillClient.PermissionState
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhotocardForm(navController: NavController, viewModel: PhotocardFormViewModel){
+    val kGroupsList : List<String> by viewModel.allGroups.observeAsState(initial = listOf())
     Box(
         Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        photocards(Modifier.align(Alignment.Center), viewModel, navController)
+        Column(Modifier.align(Alignment.Center)) {
+            AlbumNameTextField()
+            SelectPhotocardImage()
+            KgroupExposedDropdownMenuBox(kGroupsList)
+            ValueTextField()
+        }
+
     }
-}
-@Composable
-fun photocards(modifier: Modifier, viewModel: PhotocardFormViewModel, navController: NavController){
-    AlbumNameTextField(modifier)
-    SelectPhotocardImage(modifier)
 }
 
 @Composable
-fun SelectPhotocardImage(modifier : Modifier) {
+fun SelectPhotocardImage() {
     var selectedImageUri by remember { mutableStateOf<Uri?>(null)}
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         selectedImageUri = uri
@@ -68,8 +74,10 @@ fun SelectPhotocardImage(modifier : Modifier) {
         }
         Button(onClick = { 
             
-        }) {
+        },
+            enabled = false) {
             Text(text = "Sacar foto")
+
         }
         
         
@@ -79,12 +87,12 @@ fun SelectPhotocardImage(modifier : Modifier) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AlbumNameTextField(modifier: Modifier) {
-    Column(modifier = modifier) {
+fun AlbumNameTextField() {
+    Column() {
         Text(
             text = "¿A qué álbum pertenece ésta photocard?",
             textAlign = TextAlign.Left,
-            color = Color(0xFF7D5260),
+            color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(8.dp)
         )
@@ -102,7 +110,8 @@ fun AlbumNameTextField(modifier: Modifier) {
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                 unfocusedBorderColor = MaterialTheme.colorScheme.primary
             ),
-            shape = RoundedCornerShape(15.dp)
+            shape = RoundedCornerShape(15.dp),
+            modifier = Modifier.fillMaxWidth()
         )
     }
 
@@ -110,12 +119,12 @@ fun AlbumNameTextField(modifier: Modifier) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ValueTextField(modifier: Modifier) {
-    Column(modifier = modifier) {
+fun ValueTextField() {
+    Column() {
         Text(
             text = "¿Cuál es el valor de la photocard?",
             textAlign = TextAlign.Left,
-            color = Color(0xFF7D5260),
+            color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(8.dp)
         )
@@ -123,7 +132,7 @@ fun ValueTextField(modifier: Modifier) {
             value = "value",
             onValueChange = { },
             placeholder = { Text(text = "value") },
-            textStyle = TextStyle(color = Color.Black),
+            textStyle = TextStyle(MaterialTheme.colorScheme.onSecondaryContainer),
             singleLine = true,
             maxLines = 1,
             label = { Text(text = "username") },
@@ -133,7 +142,8 @@ fun ValueTextField(modifier: Modifier) {
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                 unfocusedBorderColor = MaterialTheme.colorScheme.primary
             ),
-            shape = RoundedCornerShape(15.dp)
+            shape = RoundedCornerShape(15.dp),
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }

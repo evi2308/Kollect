@@ -122,6 +122,43 @@ class ProfileScreenViewModel : ViewModel() {
                 }
         }
     }
+    fun addIdolToUser(kGroup: String, idol:String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            subColReference = userID?.let { getIdolSubColReference(it) }
+        }
+
+        if (subColReference != null) {
+            val idolData = mapOf(
+                "group_name" to kGroup,
+                "idol_name" to idol)
+            subColReference!!.add(idolData)
+                .addOnSuccessListener {
+                    Log.d("Hola", "Se ha añadido el idol, ${idolData}")
+
+                    // Call getKGroupListRepository to refresh the list of groups
+                    viewModelScope.launch(Dispatchers.IO) {
+                        getKGroupListRepository()
+                    }
+                }
+                .addOnFailureListener {
+                    Log.d("Hola", "Algo ha malido sal")
+                }
+        }
+    }
+
+    suspend fun getIdolSubColReference(userId: String): CollectionReference{
+        val usersCollection = db.collection("usuario")
+        val query = usersCollection.whereEqualTo("user_id", userId)
+        val querySnapshot = query.get().await()
+
+        if (!querySnapshot.isEmpty) {
+            val documentSnapshot = querySnapshot.documents.first()
+            val documentPath = documentSnapshot.reference.path
+            return db.document(documentPath).collection("Idols")
+        } else {
+            throw NoSuchElementException("User not found")
+        }
+    }
 
     // Function to get the subcollection reference
     suspend fun getSubcollectionReference(userId: String): CollectionReference {
