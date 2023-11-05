@@ -45,12 +45,13 @@ fun IdolExposedDropdownMenuBox(idols: List<String>, onItemSelected: (String) -> 
             expanded = expanded,
             onExpandedChange = {
                 expanded = !expanded
+
             }
         ) {
             TextField(
                 value = selectedText,
-                label= { Text(text = "Selecciona un grupo") },
-                placeholder = { Text(text = "Selecciona un grupo") },
+                label= { Text(text = "Selecciona un idol") },
+                placeholder = { Text(text = "Selecciona un idol") },
                 onValueChange = {},
                 readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },

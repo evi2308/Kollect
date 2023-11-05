@@ -84,7 +84,7 @@ fun addIdolTextField(
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
         singleLine = true,
         maxLines = 1,
-        label = { Text("Añade un grupo a tu coleción ") },
+        label = { Text("Añade un idol a tu coleción ") },
         colors = TextFieldDefaults.outlinedTextFieldColors(
             textColor = Color(0xFFFFFFFF),
             placeholderColor = Color(0xFFFFFFFF),
