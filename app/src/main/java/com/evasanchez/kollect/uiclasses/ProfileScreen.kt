@@ -4,6 +4,8 @@ package com.evasanchez.kollect.uiclasses
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,7 +21,9 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -31,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -45,8 +50,10 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
     val idol: String by viewModel.idol.observeAsState(initial = "")
     val kGroups : List<String> by viewModel.allGroups.observeAsState(initial = listOf())
     var selectedKGroup by remember { mutableStateOf(if (kGroups.isNotEmpty()) kGroups[0] else "") }
+    val successMessage: String? by viewModel.successMessage.observeAsState()
+
     LaunchedEffect(viewModel) {
-        viewModel.addKgroupToUser(kGroup)
+        viewModel.getKGroupListRepository()
     }
         Column{
             Text(text = "PERFIL DE USUARIO")
@@ -60,11 +67,25 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
             addIdolTextField (viewModel,idol, {viewModel.onIdolChanged(it)}, selectedKGroup) {selectedKGroup, idolText ->
                 viewModel.addIdolToUser(selectedKGroup, idolText)
             }
-            
+            if (successMessage != null) {
+                Snackbar(
+                    modifier = Modifier.padding(16.dp),
+                    action = {
+                        TextButton(
+                            onClick = { viewModel.clearSuccessMessage() }
+                        ) {
+                            Text("Dismiss")
+                        }
+                    }
+                ) {
+                    Text(text = successMessage!!)
+                }
+            }
 
 
         }
     }
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun addIdolTextField(
     viewModel: ProfileScreenViewModel,
@@ -110,20 +131,22 @@ fun addIdolTextField(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddKGroup(viewModel: ProfileScreenViewModel, kGroup: String, onKgroupChanged: (String) -> Unit, addKgroupToUser:()-> Unit) {
+fun AddKGroup(viewModel: ProfileScreenViewModel, kGroup: String, onKgroupChanged: (String) -> Unit, addKgroupToUser: () -> Unit) {
     var isButtonEnabled by remember { mutableStateOf(false) }
+
     OutlinedTextField(
         value = kGroup,
-        onValueChange = { onKgroupChanged(it)
-            isButtonEnabled = it.isNotBlank()},
-
+        onValueChange = {
+            onKgroupChanged(it)
+            isButtonEnabled = it.isNotBlank()
+        },
         modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text("Kgorup") },
+        placeholder = { Text("Kgroup") },
         textStyle = TextStyle(color = MaterialTheme.colorScheme.onPrimaryContainer),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
         singleLine = true,
         maxLines = 1,
-        label = { Text("Añade un grupo a tu coleción ") },
+        label = { Text("Añade un grupo a tu colección") },
         colors = TextFieldDefaults.outlinedTextFieldColors(
             textColor = Color(0xFFFFFFFF),
             placeholderColor = Color(0xFFFFFFFF),
@@ -132,18 +155,25 @@ fun AddKGroup(viewModel: ProfileScreenViewModel, kGroup: String, onKgroupChanged
         ),
         shape = RoundedCornerShape(15.dp)
     )
+
     Spacer(modifier = Modifier.padding(16.dp))
+
+    LaunchedEffect(kGroup) {
+        isButtonEnabled = kGroup.isNotBlank()
+    }
+
     ElevatedButton(
         onClick = {
-            Log.d("Hola", "El boton hace click")
-            addKgroupToUser()
-
-    },
+            if (isButtonEnabled) {
+                Log.d("Hola", "El boton hace click")
+                addKgroupToUser()
+            }
+        },
         modifier = Modifier
             .height(40.dp),
         enabled = isButtonEnabled
-        ) {
-            Text(text = "Añadir")
+    ) {
+        Text(text = "Añadir")
     }
 }
 

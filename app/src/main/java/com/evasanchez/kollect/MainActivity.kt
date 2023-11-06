@@ -92,6 +92,7 @@ class MainActivity : ComponentActivity() {
                     },
 
                     bottomBar = { if (showBottomBar) BottomNavigationBar(navController = navController) }
+
                 )
             }
         }

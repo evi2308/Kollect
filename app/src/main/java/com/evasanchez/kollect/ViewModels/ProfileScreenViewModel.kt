@@ -1,6 +1,8 @@
 package com.evasanchez.kollect.ViewModels
 
 import android.util.Log
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -31,6 +33,8 @@ class ProfileScreenViewModel : ViewModel() {
     private val _addIdolEnabled = MutableLiveData<Boolean>()
     val addIdolEnabled: LiveData<Boolean> = _addIdolEnabled
 
+    private val _successMessage = MutableLiveData<String>()
+    val successMessage: LiveData<String> = _successMessage
 
     init {
         Log.d("A ver", "Entra en el init")
@@ -110,11 +114,12 @@ class ProfileScreenViewModel : ViewModel() {
             val kGroupData = mapOf("group_name" to kGroup)
             subColReference!!.add(kGroupData)
                 .addOnSuccessListener {
+                    _successMessage.value = "Kgroup added successfully"
                     Log.d("Hola", "Se ha creado el grupo")
-
                     // Call getKGroupListRepository to refresh the list of groups
                     viewModelScope.launch(Dispatchers.IO) {
                         getKGroupListRepository()
+
                     }
                 }
                 .addOnFailureListener {
@@ -125,25 +130,26 @@ class ProfileScreenViewModel : ViewModel() {
     fun addIdolToUser(kGroup: String, idol:String) {
         viewModelScope.launch(Dispatchers.IO) {
             subColReference = userID?.let { getIdolSubColReference(it) }
-        }
+            if (subColReference != null) {
+                val idolData = mapOf(
+                    "group_name" to kGroup,
+                    "idol_name" to idol)
+                subColReference!!.add(idolData)
+                    .addOnSuccessListener {
+                        Log.d("Hola", "Se ha añadido el idol, ${idolData}")
 
-        if (subColReference != null) {
-            val idolData = mapOf(
-                "group_name" to kGroup,
-                "idol_name" to idol)
-            subColReference!!.add(idolData)
-                .addOnSuccessListener {
-                    Log.d("Hola", "Se ha añadido el idol, ${idolData}")
-
-                    // Call getKGroupListRepository to refresh the list of groups
-                    viewModelScope.launch(Dispatchers.IO) {
-                        getKGroupListRepository()
+                        // Call getKGroupListRepository to refresh the list of groups
+                        viewModelScope.launch(Dispatchers.IO) {
+                            //getKGroupListRepository()
+                        }
                     }
-                }
-                .addOnFailureListener {
-                    Log.d("Hola", "Algo ha malido sal")
-                }
+                    .addOnFailureListener {
+                        Log.d("Hola", "Algo ha malido sal")
+                    }
+            }
         }
+
+
     }
 
     suspend fun getIdolSubColReference(userId: String): CollectionReference{
@@ -204,7 +210,9 @@ class ProfileScreenViewModel : ViewModel() {
             }
         }
     }
-
+    fun clearSuccessMessage() {
+        _successMessage.value = null
+    }
 
 
 }
