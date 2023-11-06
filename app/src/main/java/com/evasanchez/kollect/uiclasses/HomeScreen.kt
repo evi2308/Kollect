@@ -49,22 +49,7 @@ import com.evasanchez.kollect.navigation.AppScreens
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
-    Scaffold {
 
-        FloatingActionButton(
-            onClick = {
-                navController.navigate(AppScreens.PhotocardForm.route)
-            },
-
-
-            ) {
-
-            Icon(Icons.Filled.Add, "Añadir photocard")
-        }
-
-
-
-    }
 
     }
 

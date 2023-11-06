@@ -1,5 +1,6 @@
 package com.evasanchez.kollect.ViewModels
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -21,9 +22,6 @@ class PhotocardFormViewModel: ViewModel() {
    private val auth: FirebaseAuth = Firebase.auth
    val userID = auth.currentUser?.uid
 
-   private val _photocardId = MutableLiveData<String>()
-    val photocardId : LiveData<String> = _photocardId
-
     private val _albumName = MutableLiveData<String>()
     val albumName : LiveData<String> = _albumName
 
@@ -42,8 +40,8 @@ class PhotocardFormViewModel: ViewModel() {
     private val _type = MutableLiveData<String>()
     val type : LiveData<String> = _type
 
-    private val _photocardURL = MutableLiveData<String>()
-    val photocardURL : LiveData<String> = _photocardURL
+    private val _photocardUri = MutableLiveData<Uri>()
+    val photocardUri : LiveData<Uri> = _photocardUri
 
     private val _photocardVersion = MutableLiveData<String>()
     val photocardVersion : LiveData<String> = _photocardVersion
@@ -64,6 +62,15 @@ class PhotocardFormViewModel: ViewModel() {
    getIdolsBasedOnKgroup(selectedGroup)
    Log.d("PAAAA", allGroups.value.toString())  }
 
+ }
+ fun onPhotocardUriChanged(uri: Uri?) {
+  _photocardUri.value = uri
+ }
+ fun onFormTextFieldChange(albumName: String, value:String, type:String, photocardVersion:String){
+  _albumName.value = albumName
+  _value.value = value
+  _type.value = type
+  _photocardVersion.value = photocardVersion
  }
  suspend fun getSubcollectionReference(userId: String): CollectionReference {
 

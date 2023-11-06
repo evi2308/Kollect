@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -164,7 +165,7 @@ fun RegisterButton(navController: NavController) {
 
 @Composable
 fun LoginButton(loginEnabled: Boolean, singInEmailPassword: () -> Unit) {
-    Button(
+    ElevatedButton(
         onClick = {
             if (loginEnabled) {
                 singInEmailPassword()
@@ -263,25 +264,6 @@ fun IsPassVisibleIcon(isPassVisible: MutableState<Boolean>) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmailField(email: String, onTextFieldChanged: (String) -> Unit) {
-   /* TextField(
-        value = email,
-        onValueChange = { onTextFieldChanged(it) }, //Lo que se escriba en el textField se guardara en la variable text
-        modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text(text = "ejemplo@ejemplo.com") },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-        singleLine = true,
-        maxLines = 1,
-        colors = TextFieldDefaults.textFieldColors(
-            textColor = Color(0xFFFFFFFF),
-            containerColor = Color(0xFFF1D5DB),
-            placeholderColor = Color(0xFFFFFFFF),
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent
-        ),
-        shape = RoundedCornerShape(15.dp)
-    )*/
-
     OutlinedTextField(
         value = email,
         onValueChange = { onTextFieldChanged(it) },

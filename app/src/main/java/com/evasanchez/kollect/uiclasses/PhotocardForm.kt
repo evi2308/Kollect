@@ -1,7 +1,6 @@
 package com.evasanchez.kollect.uiclasses
 
 import android.annotation.SuppressLint
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -9,18 +8,26 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -36,23 +43,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import coil.compose.rememberImagePainter
 import com.evasanchez.kollect.ViewModels.PhotocardFormViewModel
-import com.google.android.gms.auth.api.phone.SmsCodeAutofillClient.PermissionState
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhotocardForm(navController: NavController, viewModel: PhotocardFormViewModel){
+    //Variables de los distintos campos, asociados al ViewModel
     val idolsList : List<String> by viewModel.allIdols.observeAsState(initial = listOf())
     val kGroups : List<String> by viewModel.allGroups.observeAsState(initial = listOf())
     var selectedKGroup by remember { mutableStateOf(if (kGroups.isNotEmpty()) kGroups[0] else "") }
     var selectedIdol by remember { mutableStateOf(if (idolsList.isNotEmpty()) idolsList[0] else "") }
+    val scrollState = rememberScrollState()
+    val albumName: String by viewModel.albumName.observeAsState(initial = "")
+    val value: String by viewModel.value.observeAsState(initial = "")
+    val status: String by viewModel.status.observeAsState(initial = "")
+    val type: String by viewModel.type.observeAsState(initial = "")
+    val photocardVersion by viewModel.photocardVersion.observeAsState(initial = "")
+    val photocardUri by viewModel.photocardUri.observeAsState(initial = "")
+
+    //En cuanto se abre la pantalla, se rellenan los componentes para seleccionar idol y grupo
     LaunchedEffect(viewModel) {
         viewModel.getKGroupListRepository()
         viewModel.getIdolsBasedOnKgroup(selectedKGroup)
@@ -62,38 +77,147 @@ fun PhotocardForm(navController: NavController, viewModel: PhotocardFormViewMode
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Column(Modifier.align(Alignment.Center)) {
-            AlbumNameTextField()
-            SelectPhotocardImage()
-
+        Column(
+            Modifier
+                .align(Alignment.Center)
+                .verticalScroll(scrollState)) {
+            AlbumNameTextField(albumName,{viewModel.onFormTextFieldChange(it,value, type, photocardVersion )} )
+            Spacer(modifier = Modifier.size(8.dp))
+            ValueTextField(value,{viewModel.onFormTextFieldChange(albumName,it, type, photocardVersion )} )
+            Spacer(modifier = Modifier.size(8.dp))
+            SelectPhotocardImage(viewModel)
+            Spacer(modifier = Modifier.size(8.dp))
+            Text(text = "Selecciona el grupo al que pertenece el idol", textAlign = TextAlign.Left, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, modifier = Modifier.padding(8.dp))
             KgroupExposedDropdownMenuBoxRelatedToIdol(kGroups){ selectedText ->
                 selectedKGroup = selectedText
                 viewModel.getIdolsBasedOnKgroup(selectedText)
             }
+            Spacer(modifier = Modifier.size(8.dp))
+            Text(text = "Selecciona el idol al que pertenece esta photocard", textAlign = TextAlign.Left, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, modifier = Modifier.padding(8.dp))
             IdolExposedDropdownMenuBox(idolsList){
                     selectedText ->
                     selectedIdol = selectedText
             }
+            ColOrWlRadioButton(status)
+            PhotocardVersionTextField(photocardVersion,{viewModel.onFormTextFieldChange(albumName,value, type, it )} )
+            PhotocardTypeTextField(type,{viewModel.onFormTextFieldChange(albumName,value, it, photocardVersion )})
+            EndFormButtons()
             }
-            ValueTextField()
+
+
         }
 
     }
 
 @Composable
-fun SelectPhotocardImage() {
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null)}
+fun EndFormButtons() {
+    Row {
+        ElevatedButton(
+            onClick = {
+
+            },
+            modifier = Modifier
+                .height(48.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFFF1D5DB),
+                disabledContainerColor = Color(0xFF7D5260)
+            ),
+        ) {
+            Text(text = "Confirmar")
+
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PhotocardTypeTextField(type: String, onFormTextFieldChange: (String) -> Unit) {
+    Column() {
+        Text(
+            text = "¿Qué tipo de photocard es?",
+            textAlign = TextAlign.Left,
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(8.dp)
+        )
+
+        OutlinedTextField(
+            value = type,
+            onValueChange = { onFormTextFieldChange(it) },
+            placeholder = { Text(text = "Album, POB, Merch, Concierto...") },
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = TextStyle(color = Color.Black),
+            singleLine = true,
+            maxLines = 1,
+            label = { Text("Album, POB, Merch, Concierto...") },
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                textColor = Color(0xFFFFFFFF),
+                placeholderColor = Color(0xFFFFFFFF),
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+            ),
+            shape = RoundedCornerShape(15.dp),
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PhotocardVersionTextField(photocardVersion: String, onFormTextFieldChange: (String) -> Unit) {
+    Column() {
+        Text(
+            text = "¿A qué álbum pertenece ésta photocard?",
+            textAlign = TextAlign.Left,
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(8.dp)
+        )
+
+        OutlinedTextField(
+            value = photocardVersion,
+            onValueChange = { onFormTextFieldChange(it) },
+            placeholder = { Text(text = "Versión de la photocard") },
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = TextStyle(color = Color.Black),
+            singleLine = true,
+            maxLines = 1,
+            label = { Text("Versión de la photocard") },
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                textColor = Color(0xFFFFFFFF),
+                placeholderColor = Color(0xFFFFFFFF),
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+
+                //focusedIndicatorColor = Color.Transparent,
+                //unfocusedIndicatorColor = Color.Transparent,
+                //disabledIndicatorColor = Color.Transparent
+            ),
+            shape = RoundedCornerShape(15.dp),
+        )
+    }
+}
+
+@Composable
+fun SelectPhotocardImage(viewModel: PhotocardFormViewModel) {
+    Text(
+        text = "Elige la foto para esta photocard",
+        textAlign = TextAlign.Left,
+        color = MaterialTheme.colorScheme.primary,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(8.dp)
+    )
+    val selectedImageUri by viewModel.photocardUri.observeAsState(initial = null)
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        selectedImageUri = uri
+        viewModel.onPhotocardUriChanged(uri)
     }
     Row(modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround) {
-        Button(onClick = {
+        ElevatedButton(onClick = {
             launcher.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly))
         }) {
             Text(text = "Elegir foto")
         }
-        Button(onClick = { 
+        ElevatedButton(onClick = {
             
         },
             enabled = false) {
@@ -108,7 +232,7 @@ fun SelectPhotocardImage() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AlbumNameTextField() {
+fun AlbumNameTextField(albumName: String, onFormTextFieldChange: (String) -> Unit) {
     Column() {
         Text(
             text = "¿A qué álbum pertenece ésta photocard?",
@@ -117,22 +241,27 @@ fun AlbumNameTextField() {
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(8.dp)
         )
+
         OutlinedTextField(
-            value = "albumName",
-            onValueChange = {  },
-            placeholder = { Text(text = "album") },
+            value = albumName,
+            onValueChange = { onFormTextFieldChange(it) },
+            placeholder = { Text(text = "Nombre del álbum") },
+            modifier = Modifier.fillMaxWidth(),
             textStyle = TextStyle(color = Color.Black),
             singleLine = true,
             maxLines = 1,
-            label = { Text(text= "username") },
+            label = { Text("Nombre del Album") },
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 textColor = Color(0xFFFFFFFF),
                 placeholderColor = Color(0xFFFFFFFF),
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.primary
+                unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+
+                //focusedIndicatorColor = Color.Transparent,
+                //unfocusedIndicatorColor = Color.Transparent,
+                //disabledIndicatorColor = Color.Transparent
             ),
             shape = RoundedCornerShape(15.dp),
-            modifier = Modifier.fillMaxWidth()
         )
     }
 
@@ -140,7 +269,7 @@ fun AlbumNameTextField() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ValueTextField() {
+fun ValueTextField(value: String, onFormTextFieldChange: (String) -> Unit) {
     Column() {
         Text(
             text = "¿Cuál es el valor de la photocard?",
@@ -150,13 +279,13 @@ fun ValueTextField() {
             modifier = Modifier.padding(8.dp)
         )
         OutlinedTextField(
-            value = "value",
-            onValueChange = { },
+            value = value,
+            onValueChange = { onFormTextFieldChange(it)},
             placeholder = { Text(text = "value") },
             textStyle = TextStyle(MaterialTheme.colorScheme.onSecondaryContainer),
             singleLine = true,
             maxLines = 1,
-            label = { Text(text = "username") },
+            label = { Text(text = "Introduce el valor sin ningún simbolo") },
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 textColor = Color(0xFFFFFFFF),
                 placeholderColor = Color(0xFFFFFFFF),
@@ -164,7 +293,8 @@ fun ValueTextField() {
                 unfocusedBorderColor = MaterialTheme.colorScheme.primary
             ),
             shape = RoundedCornerShape(15.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
     }
 }
@@ -213,3 +343,27 @@ fun KgroupExposedDropdownMenuBoxRelatedToIdol(kGroups: List<String>, onItemSelec
         }
     }
 }
+@Composable
+fun ColOrWlRadioButton(status: String) {
+    Text(
+        text = "¿Dónde quieres añadir la photocard?",
+        textAlign = TextAlign.Left,
+        color = MaterialTheme.colorScheme.primary,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(8.dp)
+    )
+    val status = remember { mutableStateOf("Wishlist") }
+
+        Spacer(modifier = Modifier.size(16.dp))
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly) {
+            RadioButton(selected = status.value == "Wishlist",
+                onClick = { status.value = "Wishlist" })
+            Text(text = "Wishlist")
+            RadioButton(selected = status.value == "Coleccion",
+                onClick = {status.value = "Coleccion"})
+            Text(text = "Coleccion")
+
+        }
+
+}
+

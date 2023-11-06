@@ -42,10 +42,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.evasanchez.kollect.ViewModels.ProfileScreenViewModel
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenViewModel) {
+
     val kGroup: String by viewModel.kGroup.observeAsState(initial = "")
     val idol: String by viewModel.idol.observeAsState(initial = "")
     val kGroups : List<String> by viewModel.allGroups.observeAsState(initial = listOf())
@@ -67,20 +66,7 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
             addIdolTextField (viewModel,idol, {viewModel.onIdolChanged(it)}, selectedKGroup) {selectedKGroup, idolText ->
                 viewModel.addIdolToUser(selectedKGroup, idolText)
             }
-            if (successMessage != null) {
-                Snackbar(
-                    modifier = Modifier.padding(16.dp),
-                    action = {
-                        TextButton(
-                            onClick = { viewModel.clearSuccessMessage() }
-                        ) {
-                            Text("Dismiss")
-                        }
-                    }
-                ) {
-                    Text(text = successMessage!!)
-                }
-            }
+            successMessage?.let { showToast(message = it) }
 
 
         }
@@ -128,6 +114,11 @@ fun addIdolTextField(
         Text(text = "Añadir")
     }
 }
+@Composable
+fun showToast(message: String) {
+    Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

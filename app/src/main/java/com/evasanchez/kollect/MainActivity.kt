@@ -1,6 +1,7 @@
 package com.evasanchez.kollect
 
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -28,6 +29,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -72,10 +74,13 @@ class MainActivity : ComponentActivity() {
                     Log.d("Autenticacion", "No hay usuario")
                     startDestination = AppScreens.LoginScreen.route
                 }
-
+                var showFAB by rememberSaveable {mutableStateOf(true) }
                 var showBottomBar by rememberSaveable { mutableStateOf(true) }
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
-
+                showFAB = when (navBackStackEntry?.destination?.route){
+                    "home_screen" -> true
+                    else -> false
+                }
                 showBottomBar = when (navBackStackEntry?.destination?.route) {
                     "login_screen" -> false // on this screen bottom bar should be hidden
                     "register_screen" -> false // here too
@@ -90,7 +95,16 @@ class MainActivity : ComponentActivity() {
                             AppNavigation(startDestination,navController)
                         }
                     },
+                    floatingActionButton = {if(showFAB) FloatingActionButton(
+                        onClick = {
+                            navController.navigate(AppScreens.PhotocardForm.route)
+                        },
 
+
+                        ) {
+
+                        Icon(Icons.Filled.Add, "Añadir photocard")
+                    }},
                     bottomBar = { if (showBottomBar) BottomNavigationBar(navController = navController) }
 
                 )

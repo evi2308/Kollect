@@ -36,6 +36,10 @@ class ProfileScreenViewModel : ViewModel() {
     private val _successMessage = MutableLiveData<String>()
     val successMessage: LiveData<String> = _successMessage
 
+    fun showSuccessToast(message: String) {
+        _successMessage.postValue(message)
+    }
+
     init {
         Log.d("A ver", "Entra en el init")
         val db = FirebaseFirestore.getInstance()
@@ -46,53 +50,6 @@ class ProfileScreenViewModel : ViewModel() {
 
             }
 
-   /* private fun listenToKgroups() {
-        Log.d("Hola", "listenToKgroups")
-
-        val kGroupColReference = userID?.let { getSubcollectionReference(it) }
-        kGroupColReference?.get()?.addOnSuccessListener {snapshot->
-            Log.d("Succes", "Entra en el addOnSuccessListener")
-            Log.d("La snapshot", "${snapshot.documents.size}")
-            snapshot?.let{
-                var kGroupList = ArrayList<String>()
-                val firstDoc = snapshot.documents[0]
-                Log.d("PRIMER DOC", "${firstDoc}")
-                snapshot?.documents?.forEach{
-                    Log.d("Funciona porfa", "${it.get("group_name")}")
-                    kGroupList.add(it.get("group_name") as String)
-                }
-                _allGroups.postValue(kGroupList)
-
-            }
-
-        }?.addOnFailureListener{
-            Log.d("No se", "No se que falla: ${it.message}")
-        }
-    }
-        /*db.collection(kGroupColReference).addSnapshotListener { snapshot, e ->
-            Log.d("JODER", "${db.collection(kGroupColReference)}")
-            Log.d("A ver", "${snapshot}")
-            if (e!= null){
-                Log.w("Listen failed", e)
-                return@addSnapshotListener //al estar en un snapshot hay que enviar el return asi
-            }else{
-                snapshot?.let{
-                    var kGroupList = ArrayList<String>()
-                    snapshot?.documents?.forEach{
-                        Log.d("Funciona porfa", "${it.get("group_name")}")
-                        kGroupList.add(it.get("group_name") as String)
-                    }
-                    allGroups.value = kGroupList
-                    onAllGroupsChanged(kGroupList)
-                }
-
-            }
-
-
-
-        }*/
-
-*/
     private var subColReference: CollectionReference? = null // Subcollection reference
 
 
@@ -114,7 +71,7 @@ class ProfileScreenViewModel : ViewModel() {
             val kGroupData = mapOf("group_name" to kGroup)
             subColReference!!.add(kGroupData)
                 .addOnSuccessListener {
-                    _successMessage.value = "Kgroup added successfully"
+                    showSuccessToast("Grupo añadido")
                     Log.d("Hola", "Se ha creado el grupo")
                     // Call getKGroupListRepository to refresh the list of groups
                     viewModelScope.launch(Dispatchers.IO) {
@@ -137,7 +94,7 @@ class ProfileScreenViewModel : ViewModel() {
                 subColReference!!.add(idolData)
                     .addOnSuccessListener {
                         Log.d("Hola", "Se ha añadido el idol, ${idolData}")
-
+                        showSuccessToast("Idol añadido")
                         // Call getKGroupListRepository to refresh the list of groups
                         viewModelScope.launch(Dispatchers.IO) {
                             //getKGroupListRepository()
