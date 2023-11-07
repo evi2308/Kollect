@@ -19,14 +19,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.evasanchez.kollect.ViewModels.IdolDropDownMenuViewModel
+import com.evasanchez.kollect.ViewModels.PhotocardFormViewModel
+
 @Composable
 fun showListIdols(){
     var viewModel =IdolDropDownMenuViewModel()
+    var photocardViewModel = PhotocardFormViewModel()
     val idols : List<String> by viewModel.allIdols.observeAsState(initial = listOf())
     var expanded by remember { mutableStateOf(false) }
     var selectedIdol by remember {  mutableStateOf(if (idols.isNotEmpty()) idols[0] else "") }
     IdolExposedDropdownMenuBox(idols, { selectedText ->
         selectedIdol = selectedText
+        photocardViewModel.onIdolSelected(selectedIdol) //SI ALGO FALLA QUITAR ESTO
     })
 
 

@@ -134,7 +134,6 @@ fun AddKGroup(viewModel: ProfileScreenViewModel, kGroup: String, onKgroupChanged
         modifier = Modifier.fillMaxWidth(),
         placeholder = { Text("Kgroup") },
         textStyle = TextStyle(color = MaterialTheme.colorScheme.onPrimaryContainer),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
         singleLine = true,
         maxLines = 1,
         label = { Text("Añade un grupo a tu colección") },

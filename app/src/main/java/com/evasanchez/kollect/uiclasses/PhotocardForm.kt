@@ -1,6 +1,7 @@
 package com.evasanchez.kollect.uiclasses
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,8 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -41,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -48,6 +50,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.evasanchez.kollect.R
 import com.evasanchez.kollect.ViewModels.PhotocardFormViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -62,11 +65,15 @@ fun PhotocardForm(navController: NavController, viewModel: PhotocardFormViewMode
     val scrollState = rememberScrollState()
     val albumName: String by viewModel.albumName.observeAsState(initial = "")
     val value: String by viewModel.value.observeAsState(initial = "")
-    val status: String by viewModel.status.observeAsState(initial = "")
     val type: String by viewModel.type.observeAsState(initial = "")
     val photocardVersion by viewModel.photocardVersion.observeAsState(initial = "")
-    val photocardUri by viewModel.photocardUri.observeAsState(initial = "")
 
+    // Observa si se debe mostrar el AlertDialog
+    val showErrorDialog = viewModel.showDialog.observeAsState(false).value
+
+    if (showErrorDialog) {
+        AlertDialogPhotocardForm(navController,viewModel)
+    }
     //En cuanto se abre la pantalla, se rellenan los componentes para seleccionar idol y grupo
     LaunchedEffect(viewModel) {
         viewModel.getKGroupListRepository()
@@ -91,17 +98,22 @@ fun PhotocardForm(navController: NavController, viewModel: PhotocardFormViewMode
             KgroupExposedDropdownMenuBoxRelatedToIdol(kGroups){ selectedText ->
                 selectedKGroup = selectedText
                 viewModel.getIdolsBasedOnKgroup(selectedText)
+                viewModel.onGroupSelected(selectedKGroup)
             }
             Spacer(modifier = Modifier.size(8.dp))
             Text(text = "Selecciona el idol al que pertenece esta photocard", textAlign = TextAlign.Left, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, modifier = Modifier.padding(8.dp))
-            IdolExposedDropdownMenuBox(idolsList){
-                    selectedText ->
+            IdolExposedDropdownMenuBox(idolsList){ selectedText ->
                     selectedIdol = selectedText
+                    viewModel.onIdolSelected(selectedIdol)
             }
-            ColOrWlRadioButton(status)
+            ColOrWlRadioButton(viewModel){ selectedStatus ->
+                viewModel.onStatusChanged(selectedStatus)
+            }
             PhotocardVersionTextField(photocardVersion,{viewModel.onFormTextFieldChange(albumName,value, type, it )} )
             PhotocardTypeTextField(type,{viewModel.onFormTextFieldChange(albumName,value, it, photocardVersion )})
-            EndFormButtons()
+            ConfirmFormButton(){
+                viewModel.createPhotocard()
+            }
             }
 
 
@@ -110,18 +122,15 @@ fun PhotocardForm(navController: NavController, viewModel: PhotocardFormViewMode
     }
 
 @Composable
-fun EndFormButtons() {
+fun ConfirmFormButton(createPhotocard: () -> Unit) {
     Row {
         ElevatedButton(
             onClick = {
-
+                Log.d("Hola", "El boton de confirmar hace click")
+                createPhotocard()
             },
             modifier = Modifier
                 .height(48.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFF1D5DB),
-                disabledContainerColor = Color(0xFF7D5260)
-            ),
         ) {
             Text(text = "Confirmar")
 
@@ -344,7 +353,7 @@ fun KgroupExposedDropdownMenuBoxRelatedToIdol(kGroups: List<String>, onItemSelec
     }
 }
 @Composable
-fun ColOrWlRadioButton(status: String) {
+fun ColOrWlRadioButton(viewModel: PhotocardFormViewModel, onStatusSelected: (String) -> Unit) {
     Text(
         text = "¿Dónde quieres añadir la photocard?",
         textAlign = TextAlign.Left,
@@ -352,18 +361,39 @@ fun ColOrWlRadioButton(status: String) {
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(8.dp)
     )
-    val status = remember { mutableStateOf("Wishlist") }
+    val status: String by viewModel.status.observeAsState(initial = "Wishlist")
 
         Spacer(modifier = Modifier.size(16.dp))
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly) {
-            RadioButton(selected = status.value == "Wishlist",
-                onClick = { status.value = "Wishlist" })
+            RadioButton(selected = status == "Wishlist",
+                onClick = {onStatusSelected("Wishlist")})
             Text(text = "Wishlist")
-            RadioButton(selected = status.value == "Coleccion",
-                onClick = {status.value = "Coleccion"})
+            RadioButton(selected = status == "Coleccion",
+                onClick = {onStatusSelected("Coleccion")})
             Text(text = "Coleccion")
 
         }
+
+}
+
+@Composable
+fun AlertDialogPhotocardForm(
+    navController: NavController,
+    viewModel: PhotocardFormViewModel
+){
+
+    AlertDialog(
+        onDismissRequest = {viewModel.onDismissDialog()},
+        confirmButton = {
+            TextButton(onClick = {
+                viewModel.onDismissDialog()
+                navController.popBackStack() }) {
+                Text(text = stringResource(id = R.string.ok_message))
+            }
+        },
+        title= { Text(text = "Se ha creado la photocard correctamente", color = MaterialTheme.colorScheme.onPrimaryContainer)},
+        text = {Text(text = ":) Photocard creada", color = MaterialTheme.colorScheme.onPrimaryContainer)}
+    )
 
 }
 

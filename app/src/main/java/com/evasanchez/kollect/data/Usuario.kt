@@ -42,7 +42,7 @@ data class Idols(
 
 }
 
-data class Wishlist(
+data class Photocard(
     val photocardId: String,
     val albumName: String,
     val status: String,
@@ -53,7 +53,19 @@ data class Wishlist(
     val photocardURL: String,
     val photocardVersion: String
 ){
-
+    fun photocardToMap(): MutableMap<String, Any>{
+        return mutableMapOf(
+            "photocard_id" to this.photocardId,
+            "album_name" to this.albumName,
+            "status" to this.status,
+            "group_name" to this.groupName,
+            "idol_name" to this.idolName,
+            "value" to this.value,
+            "type" to this.type,
+            "photocard_url" to this.photocardURL,
+            "photocard_version" to this.photocardVersion
+        )
+    }
 }
 
 data class Coleccion(

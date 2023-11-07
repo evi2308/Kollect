@@ -6,6 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.evasanchez.kollect.data.Photocard
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
@@ -13,14 +15,18 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlin.random.Random
 
 class PhotocardFormViewModel: ViewModel() {
- val db = Firebase.firestore
+   val db = Firebase.firestore
    private val auth: FirebaseAuth = Firebase.auth
    val userID = auth.currentUser?.uid
+   val storage = FirebaseStorage.getInstance()
+   val storageRef = storage.reference
 
     private val _albumName = MutableLiveData<String>()
     val albumName : LiveData<String> = _albumName
@@ -52,6 +58,9 @@ class PhotocardFormViewModel: ViewModel() {
     private val _allIdols = MutableLiveData<List<String>>()
     val allIdols: LiveData<List<String>> = _allIdols
 
+ private val _showDialog = MutableLiveData<Boolean>()
+ val showDialog: LiveData<Boolean> = _showDialog
+
  init {
   Log.d("A ver", "Entra en el init")
   val db = FirebaseFirestore.getInstance()
@@ -62,6 +71,17 @@ class PhotocardFormViewModel: ViewModel() {
    getIdolsBasedOnKgroup(selectedGroup)
    Log.d("PAAAA", allGroups.value.toString())  }
 
+ }
+
+ fun onStatusChanged(status: String){
+  _status.value = status
+ }
+ fun onIdolSelected(idolName: String) {
+  _idolName.value = idolName
+ }
+
+ fun onGroupSelected(groupName: String) {
+  _groupName.value = groupName
  }
  fun onPhotocardUriChanged(uri: Uri?) {
   _photocardUri.value = uri
@@ -82,6 +102,36 @@ class PhotocardFormViewModel: ViewModel() {
    val documentSnapshot = querySnapshot.documents.first()
    val documentPath = documentSnapshot.reference.path
    return db.document(documentPath).collection("Kgroups")
+  } else {
+   throw NoSuchElementException("User not found")
+  }
+ }
+
+ suspend fun getWishlistSubcollectionReference(userId: String): CollectionReference {
+
+  val usersCollection = db.collection("usuario")
+  val query = usersCollection.whereEqualTo("user_id", userId)
+  val querySnapshot = query.get().await()
+
+  if (!querySnapshot.isEmpty) {
+   val documentSnapshot = querySnapshot.documents.first()
+   val documentPath = documentSnapshot.reference.path
+   return db.document(documentPath).collection("Wishlist")
+  } else {
+   throw NoSuchElementException("User not found")
+  }
+ }
+
+ suspend fun getColeccionSubcollectionReference(userId: String): CollectionReference {
+
+  val usersCollection = db.collection("usuario")
+  val query = usersCollection.whereEqualTo("user_id", userId)
+  val querySnapshot = query.get().await()
+
+  if (!querySnapshot.isEmpty) {
+   val documentSnapshot = querySnapshot.documents.first()
+   val documentPath = documentSnapshot.reference.path
+   return db.document(documentPath).collection("Coleccion")
   } else {
    throw NoSuchElementException("User not found")
   }
@@ -157,6 +207,86 @@ class PhotocardFormViewModel: ViewModel() {
     _allIdols.postValue(emptyList())
    }
   }
+ }
+
+ fun createPhotocard(){
+  //Darle nombre a la photocard
+   var randomNum: String = Random.nextInt().toString()
+   var photocardNameStorage: String = "Photocard" + randomNum
+   Log.d("Nombre de la foto", "Nombre : ${photocardNameStorage}")
+  //Referencia a la photocard
+   val photocardRef = storageRef.child("photocardPics/${photocardNameStorage}")
+   val uri = photocardUri.value
+   if(uri != null){
+    val uploadTask = photocardRef.putFile(uri)
+    uploadTask.addOnFailureListener {
+     Log.d("Error al subir la imagen", "Ha habido algun error")
+    }.addOnSuccessListener { taskSnapshot ->
+     photocardRef.downloadUrl.addOnSuccessListener { uri ->
+      // Sacar la URI del archivo desde el storage
+      val downloadUri = uri.toString()
+      viewModelScope.launch {
+       addPhotocardToDB(downloadUri, photocardNameStorage)
+
+      }
+     }
+    }.addOnFailureListener { exception ->
+     Log.d("Error", "Vuelve a intentarlo mas tarde")
+    }
+
+   }else{
+    val defaultImageRef = storageRef.child("photocardPics/photocard_default.jpg")
+    defaultImageRef.downloadUrl.addOnSuccessListener {downloadUri->
+     val defaultImageURL = downloadUri.toString()
+     viewModelScope.launch {
+      addPhotocardToDB(defaultImageURL, photocardNameStorage)
+     }
+
+    }
+   }
+ }
+
+ suspend fun addPhotocardToDB(photocardUri: String, photocardNameStorage: String){
+  val photocard = Photocard(
+   photocardId = photocardNameStorage,
+   albumName = albumName.value.toString(),
+   status = status.value.toString(),
+   groupName = groupName.value.toString(),
+   idolName = idolName.value.toString(),
+   value = value.value.toString(),
+   type = type.value.toString(),
+   photocardURL = photocardUri,
+   photocardVersion = photocardVersion.value.toString()
+  ).photocardToMap()
+   if(status.value == "Wishlist"){
+    val subColRefWl = userID?.let { getWishlistSubcollectionReference(it) }
+    if (subColRefWl != null) {
+     subColRefWl.add(photocard)
+      .addOnSuccessListener {
+       Log.d("HURRA", "SE HA AÑADIDO LA PHOTOCARD(aparentemente)")
+       _showDialog.postValue(true)
+      }
+      .addOnFailureListener {
+       Log.d("Jope", "Algo ha salido mal me voy a matar")
+      }
+    }
+   }else{
+    val subColRefColeccion =userID?.let { getColeccionSubcollectionReference(it) }
+    if (subColRefColeccion != null){
+     subColRefColeccion.add(photocard)
+      .addOnSuccessListener {
+       Log.d("HURRA", "SE HA AÑADIDO LA PHOTOCARD(aparentemente)")
+       _showDialog.postValue(true)
+      }
+      .addOnFailureListener {
+       Log.d("Jope", "Algo ha salido mal me voy a matar")
+      }
+    }
+   }
+ }
+
+ fun onDismissDialog() {
+  _showDialog.value = false
  }
  }
 
