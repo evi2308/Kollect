@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.evasanchez.kollect.ViewModels.HomeScreenViewModel
 import com.evasanchez.kollect.ViewModels.LoginScreenViewModel
 import com.evasanchez.kollect.ViewModels.PhotocardFormViewModel
 import com.evasanchez.kollect.ViewModels.ProfileScreenViewModel
@@ -24,7 +25,7 @@ fun AppNavigation(startDestination : String, navController: NavHostController){
             LoginScreen(navController,viewModel = LoginScreenViewModel())
         }
         composable(route = AppScreens.HomeScreen.route){
-            HomeScreen(navController)
+            HomeScreen(navController, viewModel = HomeScreenViewModel())
         }
         composable(route = AppScreens.RegisterScreen.route){
             RegisterScreen(navController, viewModel = RegisterScreenViewModel())

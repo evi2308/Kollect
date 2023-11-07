@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.evasanchez.kollect.data.Photocard
+import com.evasanchez.kollect.data.PhotocardRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
@@ -22,6 +23,7 @@ import kotlinx.coroutines.tasks.await
 import kotlin.random.Random
 
 class PhotocardFormViewModel: ViewModel() {
+   val repository = PhotocardRepository()
    val db = Firebase.firestore
    private val auth: FirebaseAuth = Firebase.auth
    val userID = auth.currentUser?.uid
@@ -257,14 +259,16 @@ class PhotocardFormViewModel: ViewModel() {
    type = type.value.toString(),
    photocardURL = photocardUri,
    photocardVersion = photocardVersion.value.toString()
-  ).photocardToMap()
+  )
+   val photocardMap=photocard.photocardToMap()
    if(status.value == "Wishlist"){
     val subColRefWl = userID?.let { getWishlistSubcollectionReference(it) }
     if (subColRefWl != null) {
-     subColRefWl.add(photocard)
+     subColRefWl.add(photocardMap)
       .addOnSuccessListener {
        Log.d("HURRA", "SE HA AÑADIDO LA PHOTOCARD(aparentemente)")
        _showDialog.postValue(true)
+       repository.addPhotocardToMasterist(photocard)
       }
       .addOnFailureListener {
        Log.d("Jope", "Algo ha salido mal me voy a matar")
@@ -273,10 +277,11 @@ class PhotocardFormViewModel: ViewModel() {
    }else{
     val subColRefColeccion =userID?.let { getColeccionSubcollectionReference(it) }
     if (subColRefColeccion != null){
-     subColRefColeccion.add(photocard)
+     subColRefColeccion.add(photocardMap)
       .addOnSuccessListener {
        Log.d("HURRA", "SE HA AÑADIDO LA PHOTOCARD(aparentemente)")
        _showDialog.postValue(true)
+       repository.addPhotocardToMasterist(photocard)
       }
       .addOnFailureListener {
        Log.d("Jope", "Algo ha salido mal me voy a matar")
