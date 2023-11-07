@@ -52,7 +52,6 @@ import com.evasanchez.kollect.uiclasses.HomeScreen
 import com.evasanchez.kollect.uiclasses.MyProfileScreen
 import com.evasanchez.kollect.uiclasses.PhotocardForm
 import com.evasanchez.kollect.uiclasses.RegisterScreen
-import com.evasanchez.kollect.uiclasses.collectionScreen
 import com.google.firebase.FirebaseApp
 
 @OptIn(ExperimentalMaterial3Api::class)

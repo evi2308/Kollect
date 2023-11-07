@@ -1,5 +1,8 @@
 package com.evasanchez.kollect.data
 
+import com.google.errorprone.annotations.Keep
+import com.google.firebase.firestore.PropertyName
+
 data class Usuario(
     val userId: String = "",
     val username: String = "",
@@ -41,18 +44,38 @@ data class Idols(
 ){
 
 }
-
+@Keep
 data class Photocard(
+    @get:PropertyName("photocard_id")
+    @PropertyName("photocard_id")
     val photocardId: String,
+    @get:PropertyName("album_name")
+    @PropertyName("album_name")
     val albumName: String,
+    @get:PropertyName("status")
+    @PropertyName("status")
     val status: String,
+    @get:PropertyName("group_name")
+    @PropertyName("group_name")
     val groupName: String,
+    @get:PropertyName("idol_name")
+    @PropertyName("idol_name")
     val idolName: String,
+    @get:PropertyName("value")
+    @PropertyName("value")
     val value: String,
+    @get:PropertyName("type")
+    @PropertyName("type")
     val type: String,
+    @get:PropertyName("photocard_url")
+    @PropertyName("photocard_url")
     val photocardURL: String,
+    @get:PropertyName("photocard_version")
+    @PropertyName("photocard_version")
     val photocardVersion: String
+
 ){
+    constructor() : this("", "", "", "", "", "", "","","")
     fun photocardToMap(): MutableMap<String, Any>{
         return mutableMapOf(
             "photocard_id" to this.photocardId,

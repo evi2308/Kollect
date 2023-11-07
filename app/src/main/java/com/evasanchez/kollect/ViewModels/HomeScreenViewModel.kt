@@ -13,22 +13,20 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.toObject
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class HomeScreenViewModel: ViewModel() {
-    val repository = PhotocardRepository()
-    val collectionPhotocards: LiveData<List<Photocard>> = repository.photocards.map { photocards ->
-        photocards.filter { it.status == "Coleccion" }
-    }
     private var subColReference: CollectionReference? = null // Subcollection reference
     private val auth: FirebaseAuth = Firebase.auth
+
     val userID = auth.currentUser?.uid
     val db = FirebaseFirestore.getInstance()
-    val _photocardsList = MutableLiveData<List<String>>() // Change this to hold a list of Photocard
-    val photocardsList: LiveData<List<String>> = _photocardsList // Use LiveData to expose the list
+    val _photocardsList = MutableLiveData<List<Photocard>>() // Change this to hold a list of Photocard
+    val photocardsList: LiveData<List<Photocard>> = _photocardsList // Use LiveData to expose the list
 
     init {
         Log.d("A ver", "Entra en el init de HomeScreen")
@@ -61,17 +59,17 @@ class HomeScreenViewModel: ViewModel() {
             if (subColReference != null) {
                 try {
                     val querySnapshot = subColReference.get().await()
-                    val pcs_ids = mutableListOf<String>()
+                    val photocardObjList = mutableListOf<Photocard>()
 
                     for (document in querySnapshot.documents) {
-                        val photocard_id = document.getString("photocard_id")
-                        if (photocard_id != null) {
-                            Log.d("Hostia", photocard_id)
-                            pcs_ids.add(photocard_id)
+                        val photocardObj = document.toObject(Photocard::class.java)
+                        if (photocardObj != null) {
+                            Log.d("Hostia", "photocard_url")
+                            photocardObjList.add(photocardObj)
                         }
                     }
 
-                    _photocardsList.postValue(pcs_ids)
+                    _photocardsList.postValue(photocardObjList)
                 } catch (e: Exception) {
                     Log.e("Firestore Query Error", e.message ?: "Unknown error")
                     _photocardsList.postValue(emptyList())
