@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -111,7 +112,8 @@ fun PhotocardForm(navController: NavController, viewModel: PhotocardFormViewMode
             }
             PhotocardVersionTextField(photocardVersion,{viewModel.onFormTextFieldChange(albumName,value, type, it )} )
             PhotocardTypeTextField(type,{viewModel.onFormTextFieldChange(albumName,value, it, photocardVersion )})
-            ConfirmFormButton(){
+            Spacer(modifier = Modifier.size(8.dp))
+            ConfirmFormButton(navController){
                 viewModel.createPhotocard()
             }
             }
@@ -121,9 +123,11 @@ fun PhotocardForm(navController: NavController, viewModel: PhotocardFormViewMode
 
     }
 
+
+
 @Composable
-fun ConfirmFormButton(createPhotocard: () -> Unit) {
-    Row {
+fun ConfirmFormButton(navController: NavController,createPhotocard: () -> Unit) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
         ElevatedButton(
             onClick = {
                 Log.d("Hola", "El boton de confirmar hace click")
@@ -134,6 +138,14 @@ fun ConfirmFormButton(createPhotocard: () -> Unit) {
         ) {
             Text(text = "Confirmar")
 
+        }
+        ElevatedButton(
+            onClick = {
+            Log.d("Hola", "El boton de cancelar hace click")
+                navController.popBackStack()
+        },
+            modifier = Modifier.height(48.dp)) {
+            Text(text = "Cancelar")
         }
     }
 }
@@ -208,6 +220,7 @@ fun PhotocardVersionTextField(photocardVersion: String, onFormTextFieldChange: (
 
 @Composable
 fun SelectPhotocardImage(viewModel: PhotocardFormViewModel) {
+    val selectedImageUri by viewModel.photocardUri.observeAsState(initial = "https://firebasestorage.googleapis.com/v0/b/k-ollect-2bf8d.appspot.com/o/photocardPics%2Fphotocard_default.jpg?alt=media&token=51ca32dd-e06f-4d93-a73f-eea866e0a5f9")
     Text(
         text = "Elige la foto para esta photocard",
         textAlign = TextAlign.Left,
@@ -215,7 +228,8 @@ fun SelectPhotocardImage(viewModel: PhotocardFormViewModel) {
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(8.dp)
     )
-    val selectedImageUri by viewModel.photocardUri.observeAsState(initial = null)
+    AsyncImage(model = selectedImageUri, contentDescription = null, modifier = Modifier.size(200.dp).border(2.dp, MaterialTheme.colorScheme.secondary))
+
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         viewModel.onPhotocardUriChanged(uri)
     }
@@ -233,7 +247,7 @@ fun SelectPhotocardImage(viewModel: PhotocardFormViewModel) {
             Text(text = "Sacar foto")
 
         }
-        AsyncImage(model = selectedImageUri, contentDescription = null, Modifier.size(100.dp))
+
         
         
     }
