@@ -11,4 +11,6 @@ sealed class AppScreens(val route: String){
     object ProfileScreen: AppScreens("profile_screen")
     object PhotocardDetail: AppScreens("photocard_details/{photocard_id}")
 
+    object WishlistScreen: AppScreens("wishlist_screen")
+
 }

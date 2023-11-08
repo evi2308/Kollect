@@ -1,22 +1,22 @@
 package com.evasanchez.kollect.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.evasanchez.kollect.ViewModels.HomeScreenViewModel
 import com.evasanchez.kollect.ViewModels.LoginScreenViewModel
 import com.evasanchez.kollect.ViewModels.PhotocardFormViewModel
 import com.evasanchez.kollect.ViewModels.ProfileScreenViewModel
 import com.evasanchez.kollect.ViewModels.RegisterScreenViewModel
+import com.evasanchez.kollect.ViewModels.WishlistScreenViewModel
 import com.evasanchez.kollect.uiclasses.HomeScreen
 import com.evasanchez.kollect.uiclasses.LoginScreen
 import com.evasanchez.kollect.uiclasses.MyProfileScreen
 import com.evasanchez.kollect.uiclasses.PhotocardDetail
 import com.evasanchez.kollect.uiclasses.PhotocardForm
 import com.evasanchez.kollect.uiclasses.RegisterScreen
+import com.evasanchez.kollect.uiclasses.WishlistScreen
 
 @Composable
 fun AppNavigation(startDestination : String, navController: NavHostController){
@@ -41,6 +41,10 @@ fun AppNavigation(startDestination : String, navController: NavHostController){
         composable(route = AppScreens.PhotocardDetail.route){
             it.arguments?.getString("photocard_id")
                 ?.let { it1 -> PhotocardDetail(photocardId = it1) }
+        }
+
+        composable(route = AppScreens.WishlistScreen.route){
+            WishlistScreen(navController, viewModel = WishlistScreenViewModel())
         }
 
     }

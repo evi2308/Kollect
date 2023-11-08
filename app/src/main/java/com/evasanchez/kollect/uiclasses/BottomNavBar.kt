@@ -49,7 +49,7 @@ fun BottomNavigationBar(navController : NavController) {
             title = "Wishlist",
             selectedIcon =  Icons.Filled.Favorite,
             unselectedIcon =  Icons.Outlined.FavoriteBorder,
-            navRoute = "home_screen"
+            navRoute = "wishlist_screen"
         ),
         BottomNavigationItem(
             title = "Buscar",
