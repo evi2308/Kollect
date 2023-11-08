@@ -54,7 +54,7 @@ data class Photocard(
     val albumName: String,
     @get:PropertyName("status")
     @PropertyName("status")
-    val status: String,
+    val status: String = "Wishlist", //Para evitar que quede en null?
     @get:PropertyName("group_name")
     @PropertyName("group_name")
     val groupName: String,

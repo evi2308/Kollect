@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.evasanchez.kollect.ViewModels.HomeScreenViewModel
 import com.evasanchez.kollect.ViewModels.LoginScreenViewModel
+import com.evasanchez.kollect.ViewModels.PhotocardDetailViewModel
 import com.evasanchez.kollect.ViewModels.PhotocardFormViewModel
 import com.evasanchez.kollect.ViewModels.ProfileScreenViewModel
 import com.evasanchez.kollect.ViewModels.RegisterScreenViewModel
@@ -39,9 +40,12 @@ fun AppNavigation(startDestination : String, navController: NavHostController){
         }
 
         composable(route = AppScreens.PhotocardDetail.route){
-            it.arguments?.getString("photocard_id")
-                ?.let { it1 -> PhotocardDetail(photocardId = it1) }
+            val photocardId = it.arguments?.getString("photocard_id")
+            if (photocardId != null) {
+                //PhotocardDetail(navController, viewModel = PhotocardDetailViewModel(), photocard)
+            }
         }
+
 
         composable(route = AppScreens.WishlistScreen.route){
             WishlistScreen(navController, viewModel = WishlistScreenViewModel())

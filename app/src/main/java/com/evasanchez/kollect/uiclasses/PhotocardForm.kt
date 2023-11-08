@@ -377,8 +377,8 @@ fun ColOrWlRadioButton(viewModel: PhotocardFormViewModel, onStatusSelected: (Str
     )
     val status: String by viewModel.status.observeAsState(initial = "Wishlist")
 
-        Spacer(modifier = Modifier.size(16.dp))
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly) {
+    Spacer(modifier = Modifier.size(16.dp))
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly) {
             RadioButton(selected = status == "Wishlist",
                 onClick = {onStatusSelected("Wishlist")})
             Text(text = "Wishlist")

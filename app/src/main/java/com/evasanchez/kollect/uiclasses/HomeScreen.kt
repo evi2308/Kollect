@@ -103,7 +103,7 @@ fun photocardCardComponent(navController: NavController, photocard: Photocard, m
             .fillMaxWidth()
             .clickable(
                 onClick = {
-                    Log.d("Coleccion", "Photocard clickada ${photocard.photocardId}")
+                    Log.d("Coleccion", "Photocard clickada ${photocard.photocardId} ${photocard.status}")
                     navController.navigate(AppScreens.PhotocardDetail.route + photocard.photocardId)
                 }
 
