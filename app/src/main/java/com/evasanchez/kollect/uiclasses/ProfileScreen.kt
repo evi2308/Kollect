@@ -2,11 +2,9 @@
 
 package com.evasanchez.kollect.uiclasses
 
-import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,9 +20,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -40,9 +36,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.evasanchez.kollect.R
 import com.evasanchez.kollect.ViewModels.ProfileScreenViewModel
 
@@ -54,12 +53,20 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
     val kGroups : List<String> by viewModel.allGroups.observeAsState(initial = listOf())
     var selectedKGroup by remember { mutableStateOf(if (kGroups.isNotEmpty()) kGroups[0] else "") }
     val successMessage: String? by viewModel.successMessage.observeAsState()
-
+    val profilePicture: String by viewModel.profilePicture.observeAsState(initial = "https://firebasestorage.googleapis.com/v0/b/k-ollect-2bf8d.appspot.com/o/profilePics%2Fpfp_default.jpg?alt=media&token=5383fb77-e3fa-4e67-bae5-9415344fb777")
+    val username: String by viewModel.username.observeAsState(initial = "Usuario")
     LaunchedEffect(viewModel) {
         viewModel.getKGroupListRepository()
+        viewModel.getProfilePicture()
+        viewModel.getUsername()
     }
         Column{
-            ProfileImage(modifier = Modifier.height(150.dp).align(Alignment.CenterHorizontally))
+            ProfileImage(profilePicture,modifier = Modifier
+                .height(150.dp)
+                .align(Alignment.CenterHorizontally)
+                .padding(16.dp))
+            Spacer(Modifier.height(16.dp))
+            showUsername(username)
             AddKGroup(viewModel, kGroup,{ viewModel.onKGroupChanged(it) })  {viewModel.addKgroupToUser(kGroup)}
             Spacer(Modifier.padding(16.dp))
             Text(text = "Añade un Idol a tu colección",
@@ -75,6 +82,14 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
 
         }
     }
+@Composable
+fun showUsername(username: String) {
+    Column(modifier = Modifier.fillMaxWidth().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(text = username, style = TextStyle(color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold, fontSize = 30.sp))
+    }
+
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun addIdolTextField(
@@ -124,12 +139,8 @@ fun showToast(message: String) {
 }
 
 @Composable
-fun ProfileImage(modifier: Modifier) {
-    Image(
-        painterResource(id = R.drawable.logo),
-        contentDescription = "Logo de Kollect",
-        modifier = modifier
-    )
+fun ProfileImage(profilePicture: String, modifier: Modifier) {
+    AsyncImage(model = profilePicture, contentDescription = "ProfilePic", modifier = modifier )
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -3,6 +3,7 @@ package com.evasanchez.kollect.ViewModels
 import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
@@ -13,9 +14,11 @@ import androidx.lifecycle.viewModelScope
 import com.evasanchez.kollect.data.Usuario
 import com.evasanchez.kollect.uiclasses.LoginScreen
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 class RegisterScreenViewModel: ViewModel() {
     private val auth: FirebaseAuth = Firebase.auth
@@ -36,8 +39,12 @@ class RegisterScreenViewModel: ViewModel() {
         _email.value = email
         _password.value = password
         _username.value = username
-        isValidEmail(email) { isEmailValid ->
-            _loginEnabled.value = isEmailValid && isValidPassword(password)
+        viewModelScope.launch {
+            val usernameExists = doesUsernameExist(username)
+
+            isValidEmail(email) { isEmailValid ->
+                _loginEnabled.value = isEmailValid && isValidPassword(password) && !usernameExists
+            }
         }
 
     }
@@ -64,6 +71,15 @@ class RegisterScreenViewModel: ViewModel() {
                 onResult(false)
             }
     }
+    suspend fun doesUsernameExist(username: String): Boolean {
+        val db = FirebaseFirestore.getInstance()
+        val usersCollection = db.collection("usuario")
+
+        val query = usersCollection.whereEqualTo("username", username)
+        val querySnapshot = query.get().await()
+
+        return !querySnapshot.isEmpty
+    }
 
 
     fun createUserEmailPassword(email: String, password: String, loginScreen: () -> Unit) =
@@ -89,7 +105,8 @@ class RegisterScreenViewModel: ViewModel() {
         val user = Usuario(
             email = email.value.toString(),
             username = username.value.toString(),
-            userId = currentuserid.toString()
+            userId = currentuserid.toString(),
+            pfpURL = "https://firebasestorage.googleapis.com/v0/b/k-ollect-2bf8d.appspot.com/o/profilePics%2Fpfp_default.jpg?alt=media&token=5383fb77-e3fa-4e67-bae5-9415344fb777"
         ).userToMap()
         FirebaseFirestore.getInstance().collection("usuario").add(user)
             .addOnSuccessListener {
@@ -97,23 +114,6 @@ class RegisterScreenViewModel: ViewModel() {
         }.addOnFailureListener{
             Log.d("NO AÑADIDO", "Esto es una mierda")
         }
-    }
-    private fun addUserNameToDB(){
-        val userid = auth.currentUser?.uid
-        val userDataRegister = Usuario(
-            email = email.value.toString(),
-            username = username.value.toString(),
-            userId = userid.toString()
-
-        ).userToMap()
-
-        FirebaseFirestore.getInstance().collection("usuario").add(userDataRegister)
-            .addOnSuccessListener {
-                Log.d("Kollect", "Usuario añadido a la base de datos")
-            }
-            .addOnFailureListener{
-                Log.d("Kollect", "Algo ha salido mal")
-            }
     }
 
 }

@@ -36,6 +36,12 @@ class ProfileScreenViewModel : ViewModel() {
     private val _successMessage = MutableLiveData<String>()
     val successMessage: LiveData<String> = _successMessage
 
+    private val _profilePicture = MutableLiveData<String>()
+    val profilePicture: LiveData<String> = _profilePicture
+
+    private val _username = MutableLiveData<String>()
+    val username: LiveData<String> = _username
+
     fun showSuccessToast(message: String) {
         _successMessage.postValue(message)
     }
@@ -46,7 +52,8 @@ class ProfileScreenViewModel : ViewModel() {
         db.firestoreSettings = FirebaseFirestoreSettings.Builder().build()
         viewModelScope.launch {
             getKGroupListRepository()
-            Log.d("PAAAA", allGroups.value.toString())  }
+            getProfilePicture()
+            getUsername()}
 
             }
 
@@ -167,10 +174,50 @@ class ProfileScreenViewModel : ViewModel() {
             }
         }
     }
-    fun clearSuccessMessage() {
-        _successMessage.value = null
-    }
 
+    suspend fun getProfilePicture(){
+        Log.d("GETPROFILEPIC", "Entra en getProfilePicture")
+        val usersCollection = db.collection("usuario")
+        viewModelScope.launch(Dispatchers.IO) {
+            if (usersCollection != null) {
+                try {
+                    val usernameQuery = usersCollection.whereEqualTo("user_id", userID).get().await()
+                    for (document in usernameQuery.documents) {
+                        val pfpURL = document.getString("pfpURL")
+                        if (pfpURL != null) {
+                            Log.d("pfp", pfpURL)
+                            _username.postValue(pfpURL)
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("Firestore Query Error", e.message ?: "Unknown error")
+                }
+            }
+        }
+
+
+}
+    suspend fun getUsername(){
+        Log.d("GETUSERNAME", "Entra en getUsername")
+        val usersCollection = db.collection("usuario")
+        viewModelScope.launch(Dispatchers.IO) {
+            if (usersCollection != null) {
+                try {
+                    val usernameQuery = usersCollection.whereEqualTo("user_id", userID).get().await()
+                    for (document in usernameQuery.documents) {
+                        val username = document.getString("username")
+                        if (username != null) {
+                            Log.d("User", username)
+                            _username.postValue(username)
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("Firestore Query Error", e.message ?: "Unknown error")
+                    _username.postValue("Usuario")
+                }
+            }
+        }
+    }
 
 }
 
