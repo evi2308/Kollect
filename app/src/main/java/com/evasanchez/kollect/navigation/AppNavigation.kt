@@ -14,6 +14,7 @@ import com.evasanchez.kollect.ViewModels.RegisterScreenViewModel
 import com.evasanchez.kollect.uiclasses.HomeScreen
 import com.evasanchez.kollect.uiclasses.LoginScreen
 import com.evasanchez.kollect.uiclasses.MyProfileScreen
+import com.evasanchez.kollect.uiclasses.PhotocardDetail
 import com.evasanchez.kollect.uiclasses.PhotocardForm
 import com.evasanchez.kollect.uiclasses.RegisterScreen
 
@@ -35,6 +36,11 @@ fun AppNavigation(startDestination : String, navController: NavHostController){
         }
         composable(route = AppScreens.ProfileScreen.route){
             MyProfileScreen(navController, viewModel = ProfileScreenViewModel())
+        }
+
+        composable(route = AppScreens.PhotocardDetail.route){
+            it.arguments?.getString("photocard_id")
+                ?.let { it1 -> PhotocardDetail(photocardId = it1) }
         }
 
     }

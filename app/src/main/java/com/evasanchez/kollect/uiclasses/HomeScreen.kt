@@ -1,8 +1,11 @@
 package com.evasanchez.kollect.uiclasses
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -23,6 +26,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,6 +48,7 @@ import coil.compose.AsyncImage
 import com.evasanchez.kollect.R
 import com.evasanchez.kollect.ViewModels.HomeScreenViewModel
 import com.evasanchez.kollect.data.Photocard
+import com.evasanchez.kollect.navigation.AppScreens
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -59,11 +66,12 @@ fun HomeScreen(navController: NavController, viewModel: HomeScreenViewModel) {
         }
 
     }*/
+    //val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     Scaffold(topBar ={TopAppBar(title = { Text(text = "MI COLECCIÓN",
         style = TextStyle(MaterialTheme.colorScheme.onSecondaryContainer,
         fontSize = 30.sp,
             fontWeight = FontWeight.Bold
-        ) ) })}) {
+        ) ) }, colors = TopAppBarDefaults.smallTopAppBarColors(MaterialTheme.colorScheme.secondaryContainer)) }) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(128.dp),
 
@@ -76,7 +84,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeScreenViewModel) {
             ),
             content = {
                 items(collectionPhotocards.size) { index ->
-                    photocardCardComponent(photocard = collectionPhotocards[index])
+                    photocardCardComponent(navController,photocard = collectionPhotocards[index])
                 }
             }
         )
@@ -89,9 +97,17 @@ fun HomeScreen(navController: NavController, viewModel: HomeScreenViewModel) {
 
 
 @Composable
-fun photocardCardComponent(photocard: Photocard, modifier: Modifier = Modifier) {
+fun photocardCardComponent(navController: NavController, photocard: Photocard, modifier: Modifier = Modifier) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(
+                onClick = {
+                    Log.d("Coleccion", "Photocard clickada ${photocard.photocardId}")
+                    navController.navigate(AppScreens.PhotocardDetail.route + photocard.photocardId)
+                }
+
+            ),
         shape = RoundedCornerShape(15.dp),
         elevation = CardDefaults.cardElevation(5.dp)
     ) {
@@ -102,27 +118,31 @@ fun photocardCardComponent(photocard: Photocard, modifier: Modifier = Modifier) 
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
-            Box(modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(
-                colors = listOf(
-                    Color.Transparent,
-                    Color.Black
-                ), startY = 300f
-            )))
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Transparent,
+                            Color.Black
+                        ), startY = 300f
+                    )
+                ))
             Box(modifier = Modifier
                 .fillMaxSize()
                 .padding(8.dp), contentAlignment = Alignment.BottomStart) {
-                Text(text = "IDOL: " + photocard.idolName)
+                Column {
+                    Text(text = photocard.idolName,
+                        style = TextStyle(MaterialTheme.colorScheme.onSecondary,
+                            fontWeight = FontWeight.Bold))
+                    Text(text =photocard.albumName + " - " + photocard.type,
+                        style = TextStyle(MaterialTheme.colorScheme.onSecondary,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+            }
 
-            }
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp)){
-                Text(text = "ALBUM: " + photocard.albumName)
-            }
         }
-
-        
-
     }
-
 }

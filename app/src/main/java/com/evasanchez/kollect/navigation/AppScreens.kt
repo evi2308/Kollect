@@ -9,7 +9,6 @@ sealed class AppScreens(val route: String){
     object PhotocardForm: AppScreens("photocard_form")
 
     object ProfileScreen: AppScreens("profile_screen")
-
-    object KGroupListComponent: AppScreens("dropdown_screen")
+    object PhotocardDetail: AppScreens("photocard_details/{photocard_id}")
 
 }

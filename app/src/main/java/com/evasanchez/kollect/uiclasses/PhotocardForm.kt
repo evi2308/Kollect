@@ -127,7 +127,7 @@ fun PhotocardForm(navController: NavController, viewModel: PhotocardFormViewMode
 
 @Composable
 fun ConfirmFormButton(navController: NavController,createPhotocard: () -> Unit) {
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+    Row(modifier = Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
         ElevatedButton(
             onClick = {
                 Log.d("Hola", "El boton de confirmar hace click")
