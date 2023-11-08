@@ -67,7 +67,6 @@ fun HomeScreen(navController: NavController, viewModel: HomeScreenViewModel) {
         }
 
     }*/
-    //val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     Scaffold(topBar ={TopAppBar(title = { Text(text = "MI COLECCIÓN",
         style = TextStyle(MaterialTheme.colorScheme.onSecondaryContainer,
         fontSize = 30.sp,

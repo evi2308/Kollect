@@ -51,10 +51,7 @@ class ProfileScreenViewModel : ViewModel() {
         val db = FirebaseFirestore.getInstance()
         db.firestoreSettings = FirebaseFirestoreSettings.Builder().build()
         viewModelScope.launch {
-            getKGroupListRepository()
-            getProfilePicture()
-            getUsername()}
-
+            getKGroupListRepository()}
             }
 
     private var subColReference: CollectionReference? = null // Subcollection reference

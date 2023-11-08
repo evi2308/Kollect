@@ -2,6 +2,7 @@
 
 package com.evasanchez.kollect.uiclasses
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -11,8 +12,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,9 +24,12 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -45,6 +53,7 @@ import coil.compose.AsyncImage
 import com.evasanchez.kollect.R
 import com.evasanchez.kollect.ViewModels.ProfileScreenViewModel
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenViewModel) {
 
@@ -55,18 +64,28 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
     val successMessage: String? by viewModel.successMessage.observeAsState()
     val profilePicture: String by viewModel.profilePicture.observeAsState(initial = "https://firebasestorage.googleapis.com/v0/b/k-ollect-2bf8d.appspot.com/o/profilePics%2Fpfp_default.jpg?alt=media&token=5383fb77-e3fa-4e67-bae5-9415344fb777")
     val username: String by viewModel.username.observeAsState(initial = "Usuario")
+    val username_def = username
     LaunchedEffect(viewModel) {
         viewModel.getKGroupListRepository()
         viewModel.getProfilePicture()
         viewModel.getUsername()
     }
-        Column{
+    val scrollState = rememberScrollState()
+    Scaffold(topBar ={TopAppBar(title = { Text(text = "MI PERFIL",
+        style = TextStyle(MaterialTheme.colorScheme.onSecondaryContainer,
+            fontSize = 30.sp,
+            fontWeight = FontWeight.Bold
+        ) ) }, colors = TopAppBarDefaults.smallTopAppBarColors(MaterialTheme.colorScheme.secondaryContainer)) }) {
+        Column(modifier = Modifier.padding(16.dp).verticalScroll(scrollState)){
+            Spacer(modifier = Modifier.height(56.dp))
             ProfileImage(profilePicture,modifier = Modifier
                 .height(150.dp)
                 .align(Alignment.CenterHorizontally)
-                .padding(16.dp))
+                .padding(16.dp)
+                .clip(CircleShape)
+            )
             Spacer(Modifier.height(16.dp))
-            showUsername(username)
+            showUsername(username_def)
             AddKGroup(viewModel, kGroup,{ viewModel.onKGroupChanged(it) })  {viewModel.addKgroupToUser(kGroup)}
             Spacer(Modifier.padding(16.dp))
             Text(text = "Añade un Idol a tu colección",
@@ -82,10 +101,14 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
 
         }
     }
+    }
+
 @Composable
-fun showUsername(username: String) {
-    Column(modifier = Modifier.fillMaxWidth().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = username, style = TextStyle(color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold, fontSize = 30.sp))
+fun showUsername(username_def: String) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(text = username_def, style = TextStyle(color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold, fontSize = 30.sp))
     }
 
 }
