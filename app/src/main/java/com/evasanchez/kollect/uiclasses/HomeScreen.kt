@@ -47,6 +47,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.evasanchez.kollect.R
 import com.evasanchez.kollect.ViewModels.HomeScreenViewModel
+import com.evasanchez.kollect.ViewModels.PhotocardDetailViewModel
 import com.evasanchez.kollect.data.Photocard
 import com.evasanchez.kollect.navigation.AppScreens
 
@@ -103,8 +104,11 @@ fun photocardCardComponent(navController: NavController, photocard: Photocard, m
             .fillMaxWidth()
             .clickable(
                 onClick = {
-                    Log.d("Coleccion", "Photocard clickada ${photocard.photocardId} ${photocard.status}")
-                    navController.navigate(AppScreens.PhotocardDetail.route + photocard.photocardId)
+                    Log.d("Coleccion", "Photocard clickada ${photocard.photocardId}")
+                    PhotocardDetailViewModel().setPhotocardDetails(photocard)
+                    navController.navigate(AppScreens.PhotocardDetail.route) {
+
+                    }
                 }
 
             ),

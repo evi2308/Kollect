@@ -1,5 +1,6 @@
 package com.evasanchez.kollect.data
 
+import android.os.Parcelable
 import com.google.errorprone.annotations.Keep
 import com.google.firebase.firestore.PropertyName
 

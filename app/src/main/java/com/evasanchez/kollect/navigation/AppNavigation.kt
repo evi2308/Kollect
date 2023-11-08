@@ -11,6 +11,7 @@ import com.evasanchez.kollect.ViewModels.PhotocardFormViewModel
 import com.evasanchez.kollect.ViewModels.ProfileScreenViewModel
 import com.evasanchez.kollect.ViewModels.RegisterScreenViewModel
 import com.evasanchez.kollect.ViewModels.WishlistScreenViewModel
+import com.evasanchez.kollect.data.Photocard
 import com.evasanchez.kollect.uiclasses.HomeScreen
 import com.evasanchez.kollect.uiclasses.LoginScreen
 import com.evasanchez.kollect.uiclasses.MyProfileScreen
@@ -40,10 +41,7 @@ fun AppNavigation(startDestination : String, navController: NavHostController){
         }
 
         composable(route = AppScreens.PhotocardDetail.route){
-            val photocardId = it.arguments?.getString("photocard_id")
-            if (photocardId != null) {
-                //PhotocardDetail(navController, viewModel = PhotocardDetailViewModel(), photocard)
-            }
+            PhotocardDetail(navController = navController, viewModel = PhotocardDetailViewModel())
         }
 
 
