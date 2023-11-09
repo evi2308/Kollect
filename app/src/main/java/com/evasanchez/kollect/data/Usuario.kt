@@ -30,6 +30,17 @@ data class Usuario(
             "idols" to this.idols*/
         )
     }
+
+    fun doesMatchSearchQuery(query: String): Boolean {
+        val matchingCombinations = listOf(
+            "$username",
+            "$email",
+            "${username.first()}"
+        )
+        return matchingCombinations.any{
+            it.contains(query, true)
+        }
+    }
 }
 
 data class KgroupsItem(

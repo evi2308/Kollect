@@ -55,7 +55,7 @@ fun BottomNavigationBar(navController : NavController) {
             title = "Buscar",
             selectedIcon =  Icons.Filled.Search,
             unselectedIcon =  Icons.Outlined.Search,
-            navRoute = "home_screen"
+            navRoute = "search_screen"
         ),
         BottomNavigationItem(
             title = "Mensajes",

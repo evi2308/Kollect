@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -46,6 +47,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -82,10 +84,13 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
                 .height(150.dp)
                 .align(Alignment.CenterHorizontally)
                 .padding(16.dp)
+                .border(2.dp, MaterialTheme.colorScheme.secondary)
                 .clip(CircleShape)
+
             )
             Spacer(Modifier.height(16.dp))
             showUsername(username_def)
+            GroupText()
             AddKGroup(viewModel, kGroup,{ viewModel.onKGroupChanged(it) })  {viewModel.addKgroupToUser(kGroup)}
             Spacer(Modifier.padding(16.dp))
             Text(text = "Añade un Idol a tu colección",
@@ -159,6 +164,16 @@ fun addIdolTextField(
 @Composable
 fun showToast(message: String) {
     Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
+}
+@Composable
+fun GroupText(){
+    Text(
+        text = "Añade un grupo a tu colección",
+        textAlign = TextAlign.Left,
+        color = MaterialTheme.colorScheme.primary,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(8.dp)
+    )
 }
 
 @Composable

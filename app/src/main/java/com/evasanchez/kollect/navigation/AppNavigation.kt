@@ -10,6 +10,7 @@ import com.evasanchez.kollect.ViewModels.PhotocardDetailViewModel
 import com.evasanchez.kollect.ViewModels.PhotocardFormViewModel
 import com.evasanchez.kollect.ViewModels.ProfileScreenViewModel
 import com.evasanchez.kollect.ViewModels.RegisterScreenViewModel
+import com.evasanchez.kollect.ViewModels.SearchViewModel
 import com.evasanchez.kollect.ViewModels.WishlistScreenViewModel
 import com.evasanchez.kollect.data.Photocard
 import com.evasanchez.kollect.uiclasses.HomeScreen
@@ -18,6 +19,7 @@ import com.evasanchez.kollect.uiclasses.MyProfileScreen
 import com.evasanchez.kollect.uiclasses.PhotocardDetail
 import com.evasanchez.kollect.uiclasses.PhotocardForm
 import com.evasanchez.kollect.uiclasses.RegisterScreen
+import com.evasanchez.kollect.uiclasses.SearchScreen
 import com.evasanchez.kollect.uiclasses.WishlistScreen
 
 @Composable
@@ -44,9 +46,12 @@ fun AppNavigation(startDestination : String, navController: NavHostController){
             PhotocardDetail(navController = navController, viewModel = PhotocardDetailViewModel())
         }
 
-
         composable(route = AppScreens.WishlistScreen.route){
             WishlistScreen(navController, viewModel = WishlistScreenViewModel())
+        }
+
+        composable(route = AppScreens.SearchScreen.route){
+            SearchScreen(navController, viewModel = SearchViewModel())
         }
 
     }
