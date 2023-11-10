@@ -7,17 +7,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -26,11 +21,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -38,18 +31,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.evasanchez.kollect.R
 import com.evasanchez.kollect.ViewModels.HomeScreenViewModel
-import com.evasanchez.kollect.ViewModels.PhotocardDetailViewModel
 import com.evasanchez.kollect.data.Photocard
 import com.evasanchez.kollect.navigation.AppScreens
+import androidx.compose.runtime.LaunchedEffect
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -60,13 +51,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeScreenViewModel) {
     LaunchedEffect(viewModel) {
         viewModel.getPhotocardsList()
     }
-    /*LazyColumn {
-        items(collectionPhotocards) { photocard ->
-            Text("A: ${photocard.photocardVersion}")
-            photocardCardComponent(photocard)
-        }
-
-    }*/
+    val selectedPhotocard by viewModel.selectedPhotocard.observeAsState() //Photocard que quiero enviar a la pantalla de detalle
     Scaffold(topBar ={TopAppBar(title = { Text(text = "MI COLECCIÓN",
         style = TextStyle(MaterialTheme.colorScheme.onSecondaryContainer,
         fontSize = 30.sp,
@@ -84,7 +69,10 @@ fun HomeScreen(navController: NavController, viewModel: HomeScreenViewModel) {
             ),
             content = {
                 items(collectionPhotocards.size) { index ->
-                    photocardCardComponent(navController,photocard = collectionPhotocards[index])
+                }
+                items(collectionPhotocards.size) { index ->
+                    val photocard = collectionPhotocards[index]
+                    photocardCardComponent(selectedPhotocard,viewModel,navController, photocard = collectionPhotocards[index]){viewModel.addPhotocardDetail(photocard)}
                 }
             }
         )
@@ -97,19 +85,23 @@ fun HomeScreen(navController: NavController, viewModel: HomeScreenViewModel) {
 
 
 @Composable
-fun photocardCardComponent(navController: NavController, photocard: Photocard, modifier: Modifier = Modifier) {
+fun photocardCardComponent(
+    selectedPhotocard: Photocard?,
+    viewModel : HomeScreenViewModel,
+    navController: NavController,
+    photocard: Photocard,
+    addPhotocardDetail: (Photocard) -> Unit
+) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(
                 onClick = {
                     Log.d("Coleccion", "Photocard clickada ${photocard.photocardId}")
-                    PhotocardDetailViewModel().setPhotocardDetails(photocard)
-                    navController.navigate(AppScreens.PhotocardDetail.route) {
-
-                    }
-                }
-
+                    addPhotocardDetail(photocard)
+                    navController.navigate(AppScreens.PhotocardDetail.route)
+                },
             ),
         shape = RoundedCornerShape(15.dp),
         elevation = CardDefaults.cardElevation(5.dp)

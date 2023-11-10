@@ -39,15 +39,6 @@ class PhotocardDetailViewModel : ViewModel() {
     private val _photocardVersion = MutableLiveData<String>()
     val photocardVersion : LiveData<String> = _photocardVersion
 
-    fun setPhotocardDetails(photocard: Photocard){
-        _albumName.value = photocard.albumName
-        _status.value = photocard.status
-        _groupName.value = photocard.groupName
-        _idolName.value = photocard.idolName
-        _value.value = photocard.value
-        _type.value = photocard.type
-        _photocardURL.value = photocard.photocardURL
-        _photocardVersion.value = photocard.photocardVersion
-    }
+
 
 }

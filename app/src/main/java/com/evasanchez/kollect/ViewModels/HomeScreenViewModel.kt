@@ -1,6 +1,9 @@
 package com.evasanchez.kollect.ViewModels
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -20,13 +23,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class HomeScreenViewModel: ViewModel() {
-    private var subColReference: CollectionReference? = null // Subcollection reference
+    private var subColReference: CollectionReference? = null
     private val auth: FirebaseAuth = Firebase.auth
 
     val userID = auth.currentUser?.uid
     val db = FirebaseFirestore.getInstance()
-    val _photocardsList = MutableLiveData<List<Photocard>>() // Change this to hold a list of Photocard
-    val photocardsList: LiveData<List<Photocard>> = _photocardsList // Use LiveData to expose the list
+    val _photocardsList = MutableLiveData<List<Photocard>>()
+    val photocardsList: LiveData<List<Photocard>> = _photocardsList // LISTA PARA LAS PHOTOCARDS QUE PERTENECEN A LA COLECCION
 
     init {
         Log.d("A ver", "Entra en el init de HomeScreen")
@@ -79,6 +82,20 @@ class HomeScreenViewModel: ViewModel() {
                 _photocardsList.postValue(emptyList())
             }
         }
+    }
+
+    private val _selectedPhotocard = MutableLiveData<Photocard>()
+    val selectedPhotocard : LiveData<Photocard> = _selectedPhotocard
+    var selectedPhotocardDetail by mutableStateOf<Photocard?>(null)
+        private set
+
+    fun addPhotocardDetail(photocardDetailed: Photocard){
+        selectedPhotocardDetail = photocardDetailed
+    }
+    fun setPhotocardDetails(photocard: Photocard){
+        Log.d("A ver Debug", "Photocard guardada = ${photocard.photocardId}")
+        _selectedPhotocard.postValue(photocard)
+
     }
     }
 

@@ -1,6 +1,7 @@
 package com.evasanchez.kollect.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,13 +25,15 @@ import com.evasanchez.kollect.uiclasses.WishlistScreen
 
 @Composable
 fun AppNavigation(startDestination : String, navController: NavHostController){
-    //val navController = rememberNavController()
+
+    val sharedViewModel: HomeScreenViewModel = viewModel()
+
     NavHost(navController = navController, startDestination = startDestination ){
         composable(route = AppScreens.LoginScreen.route){
             LoginScreen(navController,viewModel = LoginScreenViewModel())
         }
         composable(route = AppScreens.HomeScreen.route){
-            HomeScreen(navController, viewModel = HomeScreenViewModel())
+            HomeScreen(navController, sharedViewModel)
         }
         composable(route = AppScreens.RegisterScreen.route){
             RegisterScreen(navController, viewModel = RegisterScreenViewModel())
@@ -43,7 +46,7 @@ fun AppNavigation(startDestination : String, navController: NavHostController){
         }
 
         composable(route = AppScreens.PhotocardDetail.route){
-            PhotocardDetail(navController = navController, viewModel = PhotocardDetailViewModel())
+            PhotocardDetail(navController = navController, sharedViewModel)
         }
 
         composable(route = AppScreens.WishlistScreen.route){
