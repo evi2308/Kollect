@@ -39,24 +39,30 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.evasanchez.kollect.ViewModels.CollectionWishlistViewModel
+import com.evasanchez.kollect.ViewModels.SearchViewModel
 import com.evasanchez.kollect.data.Photocard
+import com.evasanchez.kollect.data.Usuario
 import com.evasanchez.kollect.navigation.AppScreens
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WishlistScreen(navController: NavHostController, viewModel: CollectionWishlistViewModel) {
-    val collectionPhotocards by viewModel.photocardsWishlistList.observeAsState(emptyList())
+fun WishlistSearchScreen(navController: NavHostController, viewModel: SearchViewModel) {
+    val collectionPhotocards by viewModel.userPhotocardsWishlistList.observeAsState(emptyList())
+    val selectedPhotocard by viewModel.selectedPhotocard.observeAsState()
+    val selectedUser = viewModel.selectedUserDetail
+
     LaunchedEffect(viewModel) {
-        viewModel.getPhotocardsWishlistList()
+        selectedUser?.let { viewModel.getUserPhotocardsWishlistList(it.username) }
     }
-    val selectedPhotocard by viewModel.selectedPhotocard.observeAsState() //Photocard que quiero enviar a la pantalla de detalle
+
     Scaffold(topBar ={
-        TopAppBar(title = { Text(text = "MI WISHLIST",
-        style = TextStyle(MaterialTheme.colorScheme.onSecondaryContainer,
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Bold
-        ) ) }, colors = TopAppBarDefaults.smallTopAppBarColors(MaterialTheme.colorScheme.secondaryContainer)) }) {
+        TopAppBar(title = { Text(text = "WISHLIST DE ${selectedUser?.username?.uppercase()}",
+            style = TextStyle(
+                MaterialTheme.colorScheme.onSecondaryContainer,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            ) ) }, colors = TopAppBarDefaults.smallTopAppBarColors(MaterialTheme.colorScheme.secondaryContainer)) }) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(128.dp),
 
@@ -70,33 +76,24 @@ fun WishlistScreen(navController: NavHostController, viewModel: CollectionWishli
             content = {
                 items(collectionPhotocards.size) { index ->
                     val photocard = collectionPhotocards[index]
-                    photocardCardWishlistComponent(selectedPhotocard,viewModel,navController, photocard = collectionPhotocards[index]){viewModel.addPhotocardDetail(photocard)}
+                    photocardCardWishlistSearchComponent(selectedPhotocard,viewModel,navController, photocard = collectionPhotocards[index])
                 }
             }
         )
     }
-
 }
 
 @Composable
-fun photocardCardWishlistComponent(
+fun photocardCardWishlistSearchComponent(
     selectedPhotocard: Photocard?,
-    viewModel: CollectionWishlistViewModel,
+    viewModel: SearchViewModel ,
     navController: NavController,
-    photocard: Photocard,
-    addPhotocardDetail: (Photocard) -> Unit
+    photocard: Photocard
 ) {
+
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .clickable(
-                onClick = {
-                    Log.d("Coleccion", "Photocard clickada ${photocard.photocardId}")
-                    addPhotocardDetail(photocard)
-                    navController.navigate(AppScreens.PhotocardDetail.route)
-                }
-
-            ),
+            .fillMaxWidth(),
         shape = RoundedCornerShape(15.dp),
         elevation = CardDefaults.cardElevation(5.dp)
     ) {
@@ -122,13 +119,10 @@ fun photocardCardWishlistComponent(
                 .padding(8.dp), contentAlignment = Alignment.BottomStart) {
                 Column {
                     Text(text = photocard.idolName,
-                        style = TextStyle(
-                            MaterialTheme.colorScheme.onSecondary,
-                            fontWeight = FontWeight.Bold)
-                    )
+                        style = TextStyle(MaterialTheme.colorScheme.onSecondary,
+                            fontWeight = FontWeight.Bold))
                     Text(text =photocard.albumName + " - " + photocard.type,
-                        style = TextStyle(
-                            MaterialTheme.colorScheme.onSecondary,
+                        style = TextStyle(MaterialTheme.colorScheme.onSecondary,
                             fontWeight = FontWeight.Bold
                         )
                     )

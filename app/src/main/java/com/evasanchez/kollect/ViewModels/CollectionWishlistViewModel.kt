@@ -24,14 +24,14 @@ class CollectionWishlistViewModel: ViewModel() {
 
     val userID = auth.currentUser?.uid
     val db = FirebaseFirestore.getInstance()
-    val _photocardsList = MutableLiveData<List<Photocard>>()
+    private val _photocardsList = MutableLiveData<List<Photocard>>()
     val photocardsList: LiveData<List<Photocard>> = _photocardsList // LISTA PARA LAS PHOTOCARDS QUE PERTENECEN A LA COLECCION
     val usersCollection = db.collection("usuario")
     private val _showDialog = MutableLiveData<Boolean>()
     val showDialog: LiveData<Boolean> = _showDialog
 
-    val _photocardsWishlistList = MutableLiveData<List<Photocard>>() // Change this to hold a list of Photocard
-    val photocardsWishlistList: LiveData<List<Photocard>> = _photocardsWishlistList // Use LiveData to expose the list
+    private val _photocardsWishlistList = MutableLiveData<List<Photocard>>()
+    val photocardsWishlistList: LiveData<List<Photocard>> = _photocardsWishlistList
 
     private val _dialogText = MutableLiveData<String>()
     val dialogText: LiveData<String> = _dialogText

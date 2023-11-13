@@ -15,4 +15,6 @@ sealed class AppScreens(val route: String){
 
     object SearchScreen : AppScreens("search_screen")
 
+    object WishlistSearchScreen : AppScreens("wishlist_search_screen/{username}")
+
 }

@@ -6,15 +6,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.evasanchez.kollect.ViewModels.CollectionWishlistViewModel
-import com.evasanchez.kollect.ViewModels.HomeScreenViewModel
 import com.evasanchez.kollect.ViewModels.LoginScreenViewModel
-import com.evasanchez.kollect.ViewModels.PhotocardDetailViewModel
 import com.evasanchez.kollect.ViewModels.PhotocardFormViewModel
 import com.evasanchez.kollect.ViewModels.ProfileScreenViewModel
 import com.evasanchez.kollect.ViewModels.RegisterScreenViewModel
 import com.evasanchez.kollect.ViewModels.SearchViewModel
-import com.evasanchez.kollect.ViewModels.WishlistScreenViewModel
-import com.evasanchez.kollect.data.Photocard
 import com.evasanchez.kollect.uiclasses.HomeScreen
 import com.evasanchez.kollect.uiclasses.LoginScreen
 import com.evasanchez.kollect.uiclasses.MyProfileScreen
@@ -23,11 +19,14 @@ import com.evasanchez.kollect.uiclasses.PhotocardForm
 import com.evasanchez.kollect.uiclasses.RegisterScreen
 import com.evasanchez.kollect.uiclasses.SearchScreen
 import com.evasanchez.kollect.uiclasses.WishlistScreen
+import com.evasanchez.kollect.uiclasses.WishlistSearchScreen
 
 @Composable
 fun AppNavigation(startDestination : String, navController: NavHostController){
 
     val sharedViewModel: CollectionWishlistViewModel = viewModel()
+
+    val seachingViewModel : SearchViewModel = viewModel()
 
     NavHost(navController = navController, startDestination = startDestination ){
         composable(route = AppScreens.LoginScreen.route){
@@ -55,7 +54,11 @@ fun AppNavigation(startDestination : String, navController: NavHostController){
         }
 
         composable(route = AppScreens.SearchScreen.route){
-            SearchScreen(navController, viewModel = SearchViewModel())
+            SearchScreen(navController,seachingViewModel)
+        }
+
+        composable(route = AppScreens.WishlistSearchScreen.route){
+            WishlistSearchScreen(navController,seachingViewModel)
         }
 
     }
