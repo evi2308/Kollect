@@ -30,14 +30,17 @@ class CollectionWishlistViewModel: ViewModel() {
     private val _showDialog = MutableLiveData<Boolean>()
     val showDialog: LiveData<Boolean> = _showDialog
 
+    val _photocardsWishlistList = MutableLiveData<List<Photocard>>() // Change this to hold a list of Photocard
+    val photocardsWishlistList: LiveData<List<Photocard>> = _photocardsWishlistList // Use LiveData to expose the list
+
     private val _dialogText = MutableLiveData<String>()
     val dialogText: LiveData<String> = _dialogText
     init {
         Log.d("A ver", "Entra en el init de HomeScreen")
         val db = FirebaseFirestore.getInstance()
         db.firestoreSettings = FirebaseFirestoreSettings.Builder().build()
-        viewModelScope.launch {
-            getPhotocardsList()  }
+        //viewModelScope.launch {
+          //  getPhotocardsList()  }
 
     }
 
@@ -71,7 +74,7 @@ class CollectionWishlistViewModel: ViewModel() {
         }
     }
 
-    fun getPhotocardsList() {
+    fun getPhotocardsCollectionList() {
         viewModelScope.launch(Dispatchers.IO) {
             val subColReference = userID?.let { getColeccionSubcollectionReference(it) }
 
@@ -100,6 +103,35 @@ class CollectionWishlistViewModel: ViewModel() {
         }
     }
 
+    fun getPhotocardsWishlistList() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val subColReference = userID?.let { getWishlistSubcollectionReference(it) }
+
+            if (subColReference != null) {
+                try {
+                    val querySnapshot = subColReference.get().await()
+                    val photocardObjList = mutableListOf<Photocard>()
+
+                    for (document in querySnapshot.documents) {
+                        val photocardObj = document.toObject(Photocard::class.java)
+                        if (photocardObj != null) {
+                            Log.d("Hostia", "photocard_url")
+                            photocardObjList.add(photocardObj)
+                        }
+                    }
+
+                    _photocardsWishlistList.postValue(photocardObjList)
+                } catch (e: Exception) {
+                    Log.e("Firestore Query Error", e.message ?: "Unknown error")
+                    _photocardsWishlistList.postValue(emptyList())
+                }
+            } else {
+                Log.d("Else", "subColReference is null")
+                _photocardsWishlistList.postValue(emptyList())
+            }
+        }
+    }
+
     private val _selectedPhotocard = MutableLiveData<Photocard>()
     val selectedPhotocard : LiveData<Photocard> = _selectedPhotocard
     var selectedPhotocardDetail by mutableStateOf<Photocard?>(null)
@@ -109,23 +141,43 @@ class CollectionWishlistViewModel: ViewModel() {
         selectedPhotocardDetail = photocardDetailed
     }
 
-    fun deletePhotocard (photocardDetailed: Photocard){
+    fun deletePhotocard (lastScreenRoute: String, photocardDetailed: Photocard){
         viewModelScope.launch(Dispatchers.IO) {
-            val subColReference = userID?.let { getColeccionSubcollectionReference(it) }
-            if (subColReference != null) {
-                val photocardQuery = subColReference.whereEqualTo("photocard_id", photocardDetailed.photocardId).get().await()
-                if (!photocardQuery.isEmpty) {
-                    val photocardId = photocardQuery.documents.first().id
-                    subColReference.document(photocardId).delete().addOnSuccessListener {
-                        Log.d("Photocard Borrada", "Photocard Borrada existosamente")
-                        _showDialog.postValue(true)
-                        _dialogText.postValue("Photocard Borrada existosamente")
-                    }.addOnFailureListener{
-                        Log.d("Error", "Error al borrar la phtotocard")
-                        _dialogText.postValue("Algo ha salido mal, inténtalo de nuevo más tarde")
+            if(lastScreenRoute == "home_screen"){
+                val subColReference = userID?.let { getColeccionSubcollectionReference(it) }
+                if (subColReference != null) {
+                    val photocardQuery = subColReference.whereEqualTo("photocard_id", photocardDetailed.photocardId).get().await()
+                    if (!photocardQuery.isEmpty) {
+                        val photocardId = photocardQuery.documents.first().id
+                        subColReference.document(photocardId).delete().addOnSuccessListener {
+                            Log.d("Photocard Borrada", "Photocard Borrada existosamente")
+                            _showDialog.postValue(true)
+                            _dialogText.postValue("Photocard Borrada existosamente")
+                        }.addOnFailureListener{
+                            Log.d("Error", "Error al borrar la phtotocard")
+                            _dialogText.postValue("Algo ha salido mal, inténtalo de nuevo más tarde")
+                        }
                     }
                 }
             }
+            if(lastScreenRoute == "wishlist_screen"){
+                val subColReference = userID?.let { getWishlistSubcollectionReference(it) }
+                if (subColReference != null) {
+                    val photocardQuery = subColReference.whereEqualTo("photocard_id", photocardDetailed.photocardId).get().await()
+                    if (!photocardQuery.isEmpty) {
+                        val photocardId = photocardQuery.documents.first().id
+                        subColReference.document(photocardId).delete().addOnSuccessListener {
+                            Log.d("Photocard Borrada", "Photocard Borrada existosamente")
+                            _showDialog.postValue(true)
+                            _dialogText.postValue("Photocard Borrada existosamente")
+                        }.addOnFailureListener{
+                            Log.d("Error", "Error al borrar la phtotocard")
+                            _dialogText.postValue("Algo ha salido mal, inténtalo de nuevo más tarde")
+                        }
+                    }
+                }
+            }
+
         }
 
     }

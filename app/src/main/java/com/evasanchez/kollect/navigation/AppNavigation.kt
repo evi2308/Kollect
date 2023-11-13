@@ -51,7 +51,7 @@ fun AppNavigation(startDestination : String, navController: NavHostController){
         }
 
         composable(route = AppScreens.WishlistScreen.route){
-            WishlistScreen(navController, viewModel = WishlistScreenViewModel())
+            WishlistScreen(navController, viewModel = sharedViewModel)
         }
 
         composable(route = AppScreens.SearchScreen.route){

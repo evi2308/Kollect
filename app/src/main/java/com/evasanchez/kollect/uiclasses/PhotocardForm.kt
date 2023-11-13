@@ -80,6 +80,7 @@ fun PhotocardForm(navController: NavController, viewModel: PhotocardFormViewMode
         viewModel.getKGroupListRepository()
         viewModel.getIdolsBasedOnKgroup(selectedKGroup)
     }
+
     Box(
         Modifier
             .fillMaxSize()

@@ -48,7 +48,7 @@ import com.evasanchez.kollect.ViewModels.CollectionWishlistViewModel
 fun HomeScreen(navController: NavController, viewModel: CollectionWishlistViewModel) {
     val collectionPhotocards by viewModel.photocardsList.observeAsState(emptyList())
     LaunchedEffect(viewModel) {
-        viewModel.getPhotocardsList()
+        viewModel.getPhotocardsCollectionList()
     }
     val selectedPhotocard by viewModel.selectedPhotocard.observeAsState() //Photocard que quiero enviar a la pantalla de detalle
     Scaffold(topBar ={TopAppBar(title = { Text(text = "MI COLECCIÓN",

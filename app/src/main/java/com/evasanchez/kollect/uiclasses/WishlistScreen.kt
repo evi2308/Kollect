@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.evasanchez.kollect.ViewModels.CollectionWishlistViewModel
 import com.evasanchez.kollect.ViewModels.WishlistScreenViewModel
 import com.evasanchez.kollect.data.Photocard
 import com.evasanchez.kollect.navigation.AppScreens
@@ -45,19 +46,12 @@ import com.evasanchez.kollect.navigation.AppScreens
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WishlistScreen(navController: NavHostController, viewModel: WishlistScreenViewModel) {
+fun WishlistScreen(navController: NavHostController, viewModel: CollectionWishlistViewModel) {
     val collectionPhotocards by viewModel.photocardsWishlistList.observeAsState(emptyList())
     LaunchedEffect(viewModel) {
-        viewModel.getPhotocardsList()
+        viewModel.getPhotocardsWishlistList()
     }
-    /*LazyColumn {
-        items(collectionPhotocards) { photocard ->
-            Text("A: ${photocard.photocardVersion}")
-            photocardCardComponent(photocard)
-        }
-
-    }*/
-    //val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    val selectedPhotocard by viewModel.selectedPhotocard.observeAsState() //Photocard que quiero enviar a la pantalla de detalle
     Scaffold(topBar ={
         TopAppBar(title = { Text(text = "MI WISHLIST",
         style = TextStyle(MaterialTheme.colorScheme.onSecondaryContainer,
@@ -76,7 +70,8 @@ fun WishlistScreen(navController: NavHostController, viewModel: WishlistScreenVi
             ),
             content = {
                 items(collectionPhotocards.size) { index ->
-                    photocardCardWishlistComponent(navController,photocard = collectionPhotocards[index])
+                    val photocard = collectionPhotocards[index]
+                    photocardCardWishlistComponent(selectedPhotocard,viewModel,navController, photocard = collectionPhotocards[index]){viewModel.addPhotocardDetail(photocard)}
                 }
             }
         )
@@ -85,14 +80,21 @@ fun WishlistScreen(navController: NavHostController, viewModel: WishlistScreenVi
 }
 
 @Composable
-fun photocardCardWishlistComponent(navController: NavController, photocard: Photocard, modifier: Modifier = Modifier) {
+fun photocardCardWishlistComponent(
+    selectedPhotocard: Photocard?,
+    viewModel: CollectionWishlistViewModel,
+    navController: NavController,
+    photocard: Photocard,
+    addPhotocardDetail: (Photocard) -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(
                 onClick = {
                     Log.d("Coleccion", "Photocard clickada ${photocard.photocardId}")
-                    navController.navigate(AppScreens.PhotocardDetail.route + photocard.photocardId)
+                    addPhotocardDetail(photocard)
+                    navController.navigate(AppScreens.PhotocardDetail.route)
                 }
 
             ),

@@ -114,16 +114,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    suspend fun initApp(){
-        val user = auth.currentUser
-        if (user != null) {
-            startDestination = AppScreens.HomeScreen.route
-        }
-        if (user == null){
-            startDestination = AppScreens.LoginScreen.route
-
-        }
 
     }
 
-}
