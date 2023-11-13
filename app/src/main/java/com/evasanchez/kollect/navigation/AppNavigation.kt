@@ -5,6 +5,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.evasanchez.kollect.ViewModels.CollectionWishlistViewModel
 import com.evasanchez.kollect.ViewModels.HomeScreenViewModel
 import com.evasanchez.kollect.ViewModels.LoginScreenViewModel
 import com.evasanchez.kollect.ViewModels.PhotocardDetailViewModel
@@ -26,7 +27,7 @@ import com.evasanchez.kollect.uiclasses.WishlistScreen
 @Composable
 fun AppNavigation(startDestination : String, navController: NavHostController){
 
-    val sharedViewModel: HomeScreenViewModel = viewModel()
+    val sharedViewModel: CollectionWishlistViewModel = viewModel()
 
     NavHost(navController = navController, startDestination = startDestination ){
         composable(route = AppScreens.LoginScreen.route){

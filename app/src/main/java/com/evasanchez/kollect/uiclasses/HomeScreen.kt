@@ -23,7 +23,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -37,16 +36,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.evasanchez.kollect.ViewModels.HomeScreenViewModel
 import com.evasanchez.kollect.data.Photocard
 import com.evasanchez.kollect.navigation.AppScreens
 import androidx.compose.runtime.LaunchedEffect
+import com.evasanchez.kollect.ViewModels.CollectionWishlistViewModel
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController, viewModel: HomeScreenViewModel) {
+fun HomeScreen(navController: NavController, viewModel: CollectionWishlistViewModel) {
     val collectionPhotocards by viewModel.photocardsList.observeAsState(emptyList())
     LaunchedEffect(viewModel) {
         viewModel.getPhotocardsList()
@@ -87,7 +86,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeScreenViewModel) {
 @Composable
 fun photocardCardComponent(
     selectedPhotocard: Photocard?,
-    viewModel : HomeScreenViewModel,
+    viewModel: CollectionWishlistViewModel,
     navController: NavController,
     photocard: Photocard,
     addPhotocardDetail: (Photocard) -> Unit
