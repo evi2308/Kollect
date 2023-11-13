@@ -210,6 +210,34 @@ class CollectionWishlistViewModel: ViewModel() {
 
         }
     }
+    fun moveFromWishlisttoCol(photocardDetailed: Photocard){
+        viewModelScope.launch(Dispatchers.IO) {
+            val subColReferenceColeccion = userID?.let { getColeccionSubcollectionReference(it) }
+            val subColReferenceWishlist = userID?.let { getWishlistSubcollectionReference(it) }
+            if (subColReferenceColeccion != null && subColReferenceWishlist != null) {
+                val photocardQuery = subColReferenceWishlist.whereEqualTo("photocard_id", photocardDetailed.photocardId).get().await()
+                if (!photocardQuery.isEmpty) {
+                    val photocardData = photocardQuery.documents.first().data
+                    val photocardId = photocardQuery.documents.first().id
+                    subColReferenceWishlist.document(photocardId).delete().addOnSuccessListener {
+                        Log.d("Photocard Eliminada", "Ole se ha eliminado toca moverla")
+                        subColReferenceColeccion.add(photocardData!!).addOnSuccessListener {
+                            Log.d("Photocard Movida", "Photocard movida a tu coleccion exitosamente")
+                            _showDialog.postValue(true)
+                            _dialogText.postValue("Photocard movida a tu coleccion exitosamente")
+                        }
+                    }.addOnFailureListener{
+                        Log.d("Error", "Error al borrar la phtotocard")
+                        _showDialog.postValue(true)
+                        _dialogText.postValue("Algo ha salido mal, inténtalo de nuevo más tarde")
+                    }
+
+
+                }
+            }
+
+        }
+    }
     fun onDismissDialog() {
         _showDialog.value = false
     }

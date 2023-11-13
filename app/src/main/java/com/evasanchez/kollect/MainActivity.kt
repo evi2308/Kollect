@@ -81,6 +81,7 @@ class MainActivity : ComponentActivity() {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 showFAB = when (navBackStackEntry?.destination?.route){
                     "home_screen" -> true
+                    "wishlist_screen" -> true
                     else -> false
                 }
                 showBottomBar = when (navBackStackEntry?.destination?.route) {

@@ -50,7 +50,6 @@ fun PhotocardDetail(navController: NavController, viewModel: CollectionWishlistV
         }
         Spacer(modifier = Modifier.height(50.dp))
         Row() {
-            Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
                 if (lastScreen != null) {
                     viewModel.deletePhotocard(lastScreen, selectedPhotocard!!)
@@ -64,6 +63,11 @@ fun PhotocardDetail(navController: NavController, viewModel: CollectionWishlistV
             }, enabled = isLastScreenCollecion(lastScreen)) {
                 Text(text = "MOVER PHOTOCARD A WISHLIST")
             }
+        }
+        Button(onClick = {
+            viewModel.moveFromWishlisttoCol(selectedPhotocard!!)
+        }, enabled = !isLastScreenCollecion(lastScreen)) {
+            Text(text = "MOVER PHOTOCARD A COLECCION")
         }
     }
 }
