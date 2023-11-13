@@ -30,7 +30,12 @@ class HomeScreenViewModel: ViewModel() {
     val db = FirebaseFirestore.getInstance()
     val _photocardsList = MutableLiveData<List<Photocard>>()
     val photocardsList: LiveData<List<Photocard>> = _photocardsList // LISTA PARA LAS PHOTOCARDS QUE PERTENECEN A LA COLECCION
+    val usersCollection = db.collection("usuario")
+    private val _showDialog = MutableLiveData<Boolean>()
+    val showDialog: LiveData<Boolean> = _showDialog
 
+    private val _dialogText = MutableLiveData<String>()
+    val dialogText: LiveData<String> = _dialogText
     init {
         Log.d("A ver", "Entra en el init de HomeScreen")
         val db = FirebaseFirestore.getInstance()
@@ -42,7 +47,7 @@ class HomeScreenViewModel: ViewModel() {
 
     suspend fun getColeccionSubcollectionReference(userId: String): CollectionReference {
 
-        val usersCollection = db.collection("usuario")
+
         val query = usersCollection.whereEqualTo("user_id", userId)
         val querySnapshot = query.get().await()
 
@@ -92,10 +97,30 @@ class HomeScreenViewModel: ViewModel() {
     fun addPhotocardDetail(photocardDetailed: Photocard){
         selectedPhotocardDetail = photocardDetailed
     }
-    fun setPhotocardDetails(photocard: Photocard){
-        Log.d("A ver Debug", "Photocard guardada = ${photocard.photocardId}")
-        _selectedPhotocard.postValue(photocard)
+
+    fun deletePhotocard (photocardDetailed: Photocard){
+        viewModelScope.launch(Dispatchers.IO) {
+            val subColReference = userID?.let { getColeccionSubcollectionReference(it) }
+            if (subColReference != null) {
+                val photocardQuery = subColReference.whereEqualTo("photocard_id", photocardDetailed.photocardId).get().await()
+                if (!photocardQuery.isEmpty) {
+                    val photocardId = photocardQuery.documents.first().id
+                    subColReference.document(photocardId).delete().addOnSuccessListener {
+                        Log.d("Photocard Borrada", "Photocard Borrada existosamente")
+                        _showDialog.postValue(true)
+                        _dialogText.postValue("Photocard Borrada existosamente")
+                    }.addOnFailureListener{
+                        Log.d("Error", "Error al borrar la phtotocard")
+                        _dialogText.postValue("Algo ha salido mal, inténtalo de nuevo más tarde")
+                    }
+                }
+            }
+        }
 
     }
+    fun onDismissDialog() {
+        _showDialog.value = false
+    }
+
     }
 
