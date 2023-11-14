@@ -24,6 +24,7 @@ import kotlinx.coroutines.tasks.await
 
 class SearchViewModel : ViewModel() {
     val db = FirebaseFirestore.getInstance()
+    private val _usersList = MutableLiveData<List<Usuario>>()
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
 
@@ -34,7 +35,6 @@ class SearchViewModel : ViewModel() {
         }else users.filter{
             it.doesMatchSearchQuery(text)
         }
-
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
@@ -42,15 +42,21 @@ class SearchViewModel : ViewModel() {
     )
 
     init{
-        getUserList()
+        viewModelScope.launch {
+            Log.d("Init de SearchViewModel", "Init de SearchViewModel")
+            getUserList()
+        }
+
     }
+
+
     private val _userPhotocardsWishlistList = MutableLiveData<List<Photocard>>()
     val userPhotocardsWishlistList: LiveData<List<Photocard>> = _userPhotocardsWishlistList
 
     private val _selectedPhotocard = MutableLiveData<Photocard>()
     val selectedPhotocard : LiveData<Photocard> = _selectedPhotocard
 
-    private fun getUserList() {
+    fun getUserList() {
         viewModelScope.launch {
             try{
                 val userList = FirebaseFirestore.getInstance().collection("usuario").get().await().toObjects(Usuario::class.java)
@@ -111,8 +117,8 @@ class SearchViewModel : ViewModel() {
         }
     }
 
-    fun onSearchTextChanged(searchText: String) {
-        _searchText.value = searchText
+    fun onSearchTextChanged(text: String) {
+        _searchText.value = text
     }
 }
 

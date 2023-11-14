@@ -11,12 +11,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -31,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -38,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.evasanchez.kollect.R
 import com.evasanchez.kollect.ViewModels.CollectionWishlistViewModel
 import com.evasanchez.kollect.ViewModels.SearchViewModel
 import com.evasanchez.kollect.data.Photocard
@@ -53,7 +57,9 @@ fun WishlistSearchScreen(navController: NavHostController, viewModel: SearchView
     val selectedUser = viewModel.selectedUserDetail
 
     LaunchedEffect(viewModel) {
-        selectedUser?.let { viewModel.getUserPhotocardsWishlistList(it.username) }
+        selectedUser?.let {
+            viewModel.getUserPhotocardsWishlistList(it.username) }
+
     }
 
     Scaffold(topBar ={
@@ -127,6 +133,29 @@ fun photocardCardWishlistSearchComponent(
                         )
                     )
                 }
+            }
+            if (photocard.isPrio) {
+                Icon(
+                    painter = painterResource(id = R.drawable.estrella),
+                    contentDescription = "Priority Icon",
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(4.dp)
+                        .align(Alignment.TopStart),
+                    tint = Color.Unspecified
+                )
+            }
+
+            if (photocard.isOtw) {
+                Icon(
+                    painter = painterResource(id = R.drawable.carta),
+                    contentDescription = "Priority Icon",
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(4.dp)
+                        .align(Alignment.TopEnd),
+                    tint = Color.Unspecified
+                )
             }
 
         }
