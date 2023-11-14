@@ -11,10 +11,7 @@ data class Usuario(
     val pfpURL: String = "",
     val contPcs: String = "",
     val valuePcs: String = "",
-   /* val wishlist: List<Wishlist> = emptyList(),
-    val coleccion: List<Coleccion> = emptyList(),
-    val kgroups: List<Kgroups> = emptyList(),
-    val idols: List<Idols> = emptyList() */
+
 ) {
     fun userToMap(): MutableMap<String, Any>{
         return mutableMapOf(
@@ -23,11 +20,7 @@ data class Usuario(
             "email" to this.email,
             "pfpURL" to this.pfpURL,
             "cont_pcs" to this.contPcs,
-            "valuePcs" to this.valuePcs,
-            /*"wishlist" to this.wishlist,
-            "coleccion" to this.coleccion,
-            "kgroups" to this.kgroups,
-            "idols" to this.idols*/
+            "valuePcs" to this.valuePcs
         )
     }
 
@@ -43,19 +36,6 @@ data class Usuario(
     }
 }
 
-data class KgroupsItem(
-    val groupName: String
-){
-
-}
-
-data class Idols(
-    val idolId: String,
-    val idolName: String,
-    val groupName2: String
-){
-
-}
 @Keep
 data class Photocard(
     @get:PropertyName("photocard_id")
@@ -84,10 +64,16 @@ data class Photocard(
     val photocardURL: String,
     @get:PropertyName("photocard_version")
     @PropertyName("photocard_version")
-    val photocardVersion: String
+    val photocardVersion: String,
+    @get:PropertyName("is_prio")
+    @PropertyName("is_prio")
+    val isPrio: Boolean = false,
+    @get:PropertyName("is_otw")
+    @PropertyName("is_otw")
+    val isOtw: Boolean = false
 
 ){
-    constructor() : this("", "", "", "", "", "", "","","")
+    constructor() : this("", "", "", "", "", "", "","","", false, false)
     fun photocardToMap(): MutableMap<String, Any>{
         return mutableMapOf(
             "photocard_id" to this.photocardId,
@@ -98,7 +84,9 @@ data class Photocard(
             "value" to this.value,
             "type" to this.type,
             "photocard_url" to this.photocardURL,
-            "photocard_version" to this.photocardVersion
+            "photocard_version" to this.photocardVersion,
+            "is_prio" to this.isPrio,
+            "is_otw" to this.isOtw
         )
     }
 }

@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -68,6 +69,8 @@ fun PhotocardForm(navController: NavController, viewModel: PhotocardFormViewMode
     val value: String by viewModel.value.observeAsState(initial = "")
     val type: String by viewModel.type.observeAsState(initial = "")
     val photocardVersion by viewModel.photocardVersion.observeAsState(initial = "")
+    val isPrio by viewModel.isPrio.observeAsState(initial = false)
+    val isOtw by viewModel.isOtw.observeAsState(initial = false)
 
     // Observa si se debe mostrar el AlertDialog
     val showErrorDialog = viewModel.showDialog.observeAsState(false).value
@@ -113,6 +116,7 @@ fun PhotocardForm(navController: NavController, viewModel: PhotocardFormViewMode
             }
             PhotocardVersionTextField(photocardVersion,{viewModel.onFormTextFieldChange(albumName,value, type, it )} )
             PhotocardTypeTextField(type,{viewModel.onFormTextFieldChange(albumName,value, it, photocardVersion )})
+            PrioOtwCeckBoxes(isPrio, isOtw, { viewModel.isPrioChanged(it)} ) {viewModel.isOtwChanged(it) }
             Spacer(modifier = Modifier.size(8.dp))
             ConfirmFormButton(navController){
                 viewModel.createPhotocard()
@@ -124,11 +128,42 @@ fun PhotocardForm(navController: NavController, viewModel: PhotocardFormViewMode
 
     }
 
+@Composable
+fun PrioOtwCeckBoxes(isPrio: Boolean, isOtw: Boolean, isPrioChanged: (Boolean) -> Unit, isOtwChanged: (Boolean) ->Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        // Checkbox for isPrio
+        Checkbox(
+            checked = isPrio,
+            onCheckedChange = { isChecked ->
+                isPrioChanged(isChecked)
+            },
+            modifier = Modifier.weight(1f)
+        )
+        Text(text = "Prio")
+
+        // Checkbox for isOtw
+        Checkbox(
+            checked = isOtw,
+            onCheckedChange = { isChecked ->
+                isOtwChanged(isChecked)
+            },
+            modifier = Modifier.weight(1f)
+        )
+        Text(text = "OTW")
+    }
+}
 
 
 @Composable
 fun ConfirmFormButton(navController: NavController,createPhotocard: () -> Unit) {
-    Row(modifier = Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .padding(16.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
         ElevatedButton(
             onClick = {
                 Log.d("Hola", "El boton de confirmar hace click")
@@ -229,7 +264,9 @@ fun SelectPhotocardImage(viewModel: PhotocardFormViewModel) {
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(8.dp)
     )
-    AsyncImage(model = selectedImageUri, contentDescription = null, modifier = Modifier.size(200.dp).border(2.dp, MaterialTheme.colorScheme.secondary))
+    AsyncImage(model = selectedImageUri, contentDescription = null, modifier = Modifier
+        .size(200.dp)
+        .border(2.dp, MaterialTheme.colorScheme.secondary))
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         viewModel.onPhotocardUriChanged(uri)

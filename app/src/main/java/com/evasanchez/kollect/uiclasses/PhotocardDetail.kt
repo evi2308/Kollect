@@ -46,6 +46,8 @@ fun PhotocardDetail(navController: NavController, viewModel: CollectionWishlistV
                 selectedPhotocard?.albumName?.let { Text(it) }
                 selectedPhotocard?.groupName?.let { Text(it) }
                 selectedPhotocard?.idolName?.let { Text(it) }
+                Text(text = "ES PRIO: ${selectedPhotocard?.isPrio}")
+                Text(text = "ESTA OTW: ${selectedPhotocard?.isOtw}")
             }
         }
         Spacer(modifier = Modifier.height(50.dp))

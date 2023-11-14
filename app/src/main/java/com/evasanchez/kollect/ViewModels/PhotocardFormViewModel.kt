@@ -60,8 +60,14 @@ class PhotocardFormViewModel: ViewModel() {
     private val _allIdols = MutableLiveData<List<String>>()
     val allIdols: LiveData<List<String>> = _allIdols
 
- private val _showDialog = MutableLiveData<Boolean>()
- val showDialog: LiveData<Boolean> = _showDialog
+    private val _showDialog = MutableLiveData<Boolean>()
+    val showDialog: LiveData<Boolean> = _showDialog
+
+    private val _isPrio = MutableLiveData<Boolean>(false)
+    val isPrio: LiveData<Boolean> = _isPrio
+
+    private val _isOtw = MutableLiveData<Boolean>(false)
+    val isOtw: LiveData<Boolean> = _isOtw
 
  init {
   Log.d("A ver", "Entra en el init")
@@ -74,7 +80,13 @@ class PhotocardFormViewModel: ViewModel() {
    Log.d("PAAAA", allGroups.value.toString())  }
 
  }
+fun isPrioChanged(isPrio: Boolean){
+ _isPrio.value = isPrio
+}
 
+ fun isOtwChanged(isOtw: Boolean){
+  _isOtw.value = isOtw
+ }
  fun onStatusChanged(status: String){
   _status.value = status
  }
@@ -258,7 +270,9 @@ class PhotocardFormViewModel: ViewModel() {
    value = value.value.toString(),
    type = type.value.toString(),
    photocardURL = photocardUri,
-   photocardVersion = photocardVersion.value.toString()
+   photocardVersion = photocardVersion.value.toString(),
+   isPrio = isPrio.value!!,
+   isOtw = isOtw.value!!
   )
    val photocardMap=photocard.photocardToMap()
    if(status.value == "Wishlist"){
