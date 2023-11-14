@@ -53,58 +53,61 @@ fun SearchScreen(navController: NavController, viewModel: SearchViewModel){
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         OutlinedTextField(value = searchText, onValueChange = viewModel::onSearchTextChanged,modifier=Modifier.fillMaxWidth(), placeholder = { Text(text = "Buscar")}, shape = RoundedCornerShape(16.dp), leadingIcon = {Icon(imageVector = Icons.Outlined.Search, contentDescription = null)})
         Spacer(modifier = Modifier.height(16.dp))
-        LazyColumn(modifier = Modifier
-            .fillMaxWidth()
-            .weight(1f)){
-            items(users){ user ->
-                Box{
-                    Row{
-                        Card(modifier = Modifier
-                            .height(96.dp)
-                            .fillMaxWidth()
-                            .clickable(
-                                onClick = {
-                                    Log.d("Busqueda", "User clickado: ${user.username}")
-                                    viewModel.selectedUser(user)
-                                    Log.d("Busqueda", "User ${viewModel.selectedUserDetail?.username}")
-                                    if (viewModel.selectedUserDetail != null) {
-                                        navController.navigate(AppScreens.WishlistSearchScreen.route)
-                                    }
-                                },
-                            ),
-                            shape = RoundedCornerShape(15.dp),
-                            elevation = CardDefaults.cardElevation(5.dp)
-                        ) {
-                            Box(modifier = Modifier.height(200.dp)){
-                                AsyncImage(
-                                    model = user.pfpURL,
-                                    contentDescription = "Translated description of what the image contains",
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier.fillMaxSize()
-                                )
-                                Box(modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(
-                                        Brush.verticalGradient(
-                                            colors = listOf(
-                                                Color.Transparent,
-                                                Color.Black
-                                            ), startY = 300f
-                                        )
-                                    ))
-                                Box(modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(8.dp), contentAlignment = Alignment.BottomStart) {
-                                    Column {
-                                        Text(text = user.username,
-                                            style = TextStyle(
-                                                fontWeight = FontWeight.Bold))
+        if(searchText.isNotBlank()){
+            LazyColumn(modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)){
+                items(users){ user ->
+                    Box{
+                        Row{
+                            Card(modifier = Modifier
+                                .height(96.dp)
+                                .fillMaxWidth()
+                                .clickable(
+                                    onClick = {
+                                        Log.d("Busqueda", "User clickado: ${user.username}")
+                                        viewModel.selectedUser(user)
+                                        Log.d("Busqueda", "User ${viewModel.selectedUserDetail?.username}")
+                                        if (viewModel.selectedUserDetail != null) {
+                                            navController.navigate(AppScreens.WishlistSearchScreen.route)
+                                        }
+                                    },
+                                ),
+                                shape = RoundedCornerShape(15.dp),
+                                elevation = CardDefaults.cardElevation(5.dp)
+                            ) {
+                                Box(modifier = Modifier.height(200.dp)){
+                                    AsyncImage(
+                                        model = user.pfpURL,
+                                        contentDescription = "Translated description of what the image contains",
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                    Box(modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(
+                                            Brush.verticalGradient(
+                                                colors = listOf(
+                                                    Color.Transparent,
+                                                    Color.Black
+                                                ), startY = 300f
+                                            )
+                                        ))
+                                    Box(modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp), contentAlignment = Alignment.BottomStart) {
+                                        Column {
+                                            Text(text = user.username,
+                                                style = TextStyle(
+                                                    fontWeight = FontWeight.Bold))
 
+                                        }
                                     }
+
                                 }
+                            }  //Hasta aqui llega el LazyColumn
+        }
 
-                            }
-                        }
 
                     }
 

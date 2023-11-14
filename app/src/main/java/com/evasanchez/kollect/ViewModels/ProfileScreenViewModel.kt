@@ -69,24 +69,25 @@ class ProfileScreenViewModel : ViewModel() {
      fun addKgroupToUser(kGroup: String) {
         viewModelScope.launch(Dispatchers.IO) {
             subColReference = userID?.let { getSubcollectionReference(it) }
-        }
+            if (subColReference != null) {
+                val kGroupData = mapOf("group_name" to kGroup)
+                subColReference!!.add(kGroupData)
+                    .addOnSuccessListener {
+                        showSuccessToast("Grupo añadido")
+                        Log.d("Hola", "Se ha creado el grupo")
+                        // Call getKGroupListRepository to refresh the list of groups
+                        viewModelScope.launch(Dispatchers.IO) {
+                            getKGroupListRepository()
 
-        if (subColReference != null) {
-            val kGroupData = mapOf("group_name" to kGroup)
-            subColReference!!.add(kGroupData)
-                .addOnSuccessListener {
-                    showSuccessToast("Grupo añadido")
-                    Log.d("Hola", "Se ha creado el grupo")
-                    // Call getKGroupListRepository to refresh the list of groups
-                    viewModelScope.launch(Dispatchers.IO) {
-                        getKGroupListRepository()
-
+                        }
                     }
-                }
-                .addOnFailureListener {
-                    Log.d("Hola", "Algo ha malido sal")
-                }
+                    .addOnFailureListener {
+                        Log.d("Hola", "Algo ha malido sal")
+                    }
+            }
         }
+
+
     }
     fun addIdolToUser(kGroup: String, idol:String) {
         viewModelScope.launch(Dispatchers.IO) {

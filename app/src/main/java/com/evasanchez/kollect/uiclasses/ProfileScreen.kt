@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -55,6 +56,7 @@ import coil.compose.AsyncImage
 import com.evasanchez.kollect.R
 import com.evasanchez.kollect.ViewModels.ProfileScreenViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenViewModel) {
@@ -84,12 +86,12 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
                 .height(150.dp)
                 .align(Alignment.CenterHorizontally)
                 .padding(16.dp)
-                .border(2.dp, MaterialTheme.colorScheme.secondary)
                 .clip(CircleShape)
+                .border(width = 1.dp, color = MaterialTheme.colorScheme.onBackground, shape = CircleShape)
 
             )
-            Spacer(Modifier.height(16.dp))
             showUsername(username_def)
+            Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp, modifier = Modifier.padding(16.dp))
             GroupText()
             AddKGroup(viewModel, kGroup,{ viewModel.onKGroupChanged(it) })  {viewModel.addKgroupToUser(kGroup)}
             Spacer(Modifier.padding(16.dp))
@@ -178,7 +180,8 @@ fun GroupText(){
 
 @Composable
 fun ProfileImage(profilePicture: String, modifier: Modifier) {
-    AsyncImage(model = profilePicture, contentDescription = "ProfilePic", modifier = modifier )
+
+    AsyncImage(model = profilePicture, contentDescription = "ProfilePic", modifier = modifier)
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -214,10 +217,10 @@ fun AddKGroup(viewModel: ProfileScreenViewModel, kGroup: String, onKgroupChanged
 
     ElevatedButton(
         onClick = {
-            if (isButtonEnabled) {
-                Log.d("Hola", "El boton hace click")
-                addKgroupToUser()
-            }
+            Log.d("Hola", "El boton hace click")
+            Thread.sleep(3000)
+            addKgroupToUser()
+
         },
         modifier = Modifier
             .height(40.dp),
