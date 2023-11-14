@@ -11,12 +11,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Mail
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -39,6 +45,10 @@ import coil.compose.AsyncImage
 import com.evasanchez.kollect.data.Photocard
 import com.evasanchez.kollect.navigation.AppScreens
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import com.evasanchez.kollect.R
 import com.evasanchez.kollect.ViewModels.CollectionWishlistViewModel
 
 
@@ -135,6 +145,29 @@ fun photocardCardComponent(
                         )
                     )
                 }
+            }
+            if (photocard.isPrio) {
+                Icon(
+                    painter = painterResource(id = R.drawable.estrella),
+                    contentDescription = "Priority Icon",
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(4.dp)
+                        .align(Alignment.TopStart),
+                    tint = Color.Unspecified
+                )
+            }
+
+            if (photocard.isOtw) {
+                Icon(
+                    painter = painterResource(id = R.drawable.carta),
+                    contentDescription = "Priority Icon",
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(4.dp)
+                        .align(Alignment.TopEnd),
+                    tint = Color.Unspecified
+                )
             }
 
         }
