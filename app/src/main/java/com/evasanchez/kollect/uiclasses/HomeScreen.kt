@@ -48,6 +48,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.evasanchez.kollect.R
 import com.evasanchez.kollect.ViewModels.CollectionWishlistViewModel
 
@@ -109,7 +111,13 @@ fun photocardCardComponent(
                 onClick = {
                     Log.d("Coleccion", "Photocard clickada ${photocard.photocardId}")
                     addPhotocardDetail(photocard)
-                    navController.navigate(AppScreens.PhotocardDetail.route)
+                    navController.navigate(AppScreens.PhotocardDetail.route) {
+                        launchSingleTop = true
+                        restoreState = true
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                    }
                 },
             ),
         shape = RoundedCornerShape(15.dp),

@@ -1,8 +1,7 @@
 package com.evasanchez.kollect.ViewModels
 
+import android.app.Activity
 import android.util.Log
-import android.widget.Toast
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -215,6 +214,12 @@ class ProfileScreenViewModel : ViewModel() {
                 }
             }
         }
+    }
+
+    fun logout(context: Activity) {
+
+        auth.signOut()
+        context.finishActivity(0)
     }
 
 }

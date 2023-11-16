@@ -22,9 +22,11 @@ import com.evasanchez.kollect.uiclasses.WishlistScreen
 import com.evasanchez.kollect.uiclasses.WishlistSearchScreen
 
 @Composable
-fun AppNavigation(startDestination : String, navController: NavHostController){
-
-    val sharedViewModel: CollectionWishlistViewModel = viewModel()
+fun AppNavigation(
+    startDestination: String,
+    navController: NavHostController,
+    viewModel: CollectionWishlistViewModel
+){
 
     val seachingViewModel : SearchViewModel = viewModel()
 
@@ -33,7 +35,7 @@ fun AppNavigation(startDestination : String, navController: NavHostController){
             LoginScreen(navController,viewModel = LoginScreenViewModel())
         }
         composable(route = AppScreens.HomeScreen.route){
-            HomeScreen(navController, sharedViewModel)
+            HomeScreen(navController, viewModel)
         }
         composable(route = AppScreens.RegisterScreen.route){
             RegisterScreen(navController, viewModel = RegisterScreenViewModel())
@@ -46,11 +48,11 @@ fun AppNavigation(startDestination : String, navController: NavHostController){
         }
 
         composable(route = AppScreens.PhotocardDetail.route){
-            PhotocardDetail(navController = navController, sharedViewModel)
+            PhotocardDetail(navController = navController, viewModel)
         }
 
         composable(route = AppScreens.WishlistScreen.route){
-            WishlistScreen(navController, viewModel = sharedViewModel)
+            WishlistScreen(navController, viewModel = viewModel)
         }
 
         composable(route = AppScreens.SearchScreen.route){

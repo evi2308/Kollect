@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.evasanchez.kollect.R
@@ -25,6 +26,7 @@ import com.evasanchez.kollect.ViewModels.CollectionWishlistViewModel
 
 @Composable
 fun PhotocardDetail(navController: NavController, viewModel: CollectionWishlistViewModel) {
+
     // Observa si se debe mostrar el AlertDialog
     val showErrorDialog = viewModel.showDialog.observeAsState(false)
     val dialogText = viewModel.dialogText.observeAsState("").value
@@ -34,6 +36,7 @@ fun PhotocardDetail(navController: NavController, viewModel: CollectionWishlistV
     val selectedPhotocard = viewModel.selectedPhotocardDetail
     val lastScreen = navController.backQueue.elementAtOrNull(navController.backQueue.size - 2)?.destination?.route
     LaunchedEffect(selectedPhotocard) {
+        Log.d("LauchedEffect PhotocardDetail", "${selectedPhotocard?.photocardId}")
         if (selectedPhotocard != null ){
             Log.d("LaunchedEffect PhotocardDetail", "${selectedPhotocard.photocardId}")
         }

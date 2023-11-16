@@ -21,8 +21,6 @@ import kotlinx.coroutines.tasks.await
 
 class CollectionWishlistViewModel: ViewModel() {
     private val auth: FirebaseAuth = Firebase.auth
-
-    val userID = auth.currentUser?.uid
     val db = FirebaseFirestore.getInstance()
     private val _photocardsList = MutableLiveData<List<Photocard>>()
     val photocardsList: LiveData<List<Photocard>> = _photocardsList // LISTA PARA LAS PHOTOCARDS QUE PERTENECEN A LA COLECCION
@@ -38,12 +36,16 @@ class CollectionWishlistViewModel: ViewModel() {
     init {
         Log.d("A ver", "Entra en el init de HomeScreen")
         val db = FirebaseFirestore.getInstance()
-        db.firestoreSettings = FirebaseFirestoreSettings.Builder().build()
         //viewModelScope.launch {
           //  getPhotocardsList()  }
 
     }
-
+    fun clearData() {
+        // Clear or reset your LiveData and any other relevant data
+        _photocardsList.postValue(emptyList())
+        _selectedPhotocard.postValue(null)
+        Log.d("VALORES BORRADOS?", _photocardsList.value.toString())
+    }
     suspend fun getColeccionSubcollectionReference(userId: String): CollectionReference {
 
 
@@ -76,6 +78,7 @@ class CollectionWishlistViewModel: ViewModel() {
 
     fun getPhotocardsCollectionList() {
         viewModelScope.launch(Dispatchers.IO) {
+            val userID = FirebaseAuth.getInstance().currentUser?.uid
             val subColReference = userID?.let { getColeccionSubcollectionReference(it) }
 
             if (subColReference != null) {
@@ -105,6 +108,7 @@ class CollectionWishlistViewModel: ViewModel() {
 
     fun getPhotocardsWishlistList() {
         viewModelScope.launch(Dispatchers.IO) {
+            val userID = FirebaseAuth.getInstance().currentUser?.uid
             val subColReference = userID?.let { getWishlistSubcollectionReference(it) }
 
             if (subColReference != null) {
@@ -144,6 +148,7 @@ class CollectionWishlistViewModel: ViewModel() {
     fun deletePhotocard (lastScreenRoute: String, photocardDetailed: Photocard){
         viewModelScope.launch(Dispatchers.IO) {
             if(lastScreenRoute == "home_screen"){
+                val userID = FirebaseAuth.getInstance().currentUser?.uid
                 val subColReference = userID?.let { getColeccionSubcollectionReference(it) }
                 if (subColReference != null) {
                     val photocardQuery = subColReference.whereEqualTo("photocard_id", photocardDetailed.photocardId).get().await()
@@ -161,6 +166,7 @@ class CollectionWishlistViewModel: ViewModel() {
                 }
             }
             if(lastScreenRoute == "wishlist_screen"){
+                val userID = FirebaseAuth.getInstance().currentUser?.uid
                 val subColReference = userID?.let { getWishlistSubcollectionReference(it) }
                 if (subColReference != null) {
                     val photocardQuery = subColReference.whereEqualTo("photocard_id", photocardDetailed.photocardId).get().await()
@@ -184,6 +190,7 @@ class CollectionWishlistViewModel: ViewModel() {
 
     fun moveFromColtoWishlist(photocardDetailed: Photocard){
         viewModelScope.launch(Dispatchers.IO) {
+            val userID = FirebaseAuth.getInstance().currentUser?.uid
             val subColReferenceColeccion = userID?.let { getColeccionSubcollectionReference(it) }
             val subColReferenceWishlist = userID?.let { getWishlistSubcollectionReference(it) }
             if (subColReferenceColeccion != null && subColReferenceWishlist != null) {
@@ -212,6 +219,7 @@ class CollectionWishlistViewModel: ViewModel() {
     }
     fun moveFromWishlisttoCol(photocardDetailed: Photocard){
         viewModelScope.launch(Dispatchers.IO) {
+            val userID = FirebaseAuth.getInstance().currentUser?.uid
             val subColReferenceColeccion = userID?.let { getColeccionSubcollectionReference(it) }
             val subColReferenceWishlist = userID?.let { getWishlistSubcollectionReference(it) }
             if (subColReferenceColeccion != null && subColReferenceWishlist != null) {

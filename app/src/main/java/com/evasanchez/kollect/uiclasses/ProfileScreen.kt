@@ -3,9 +3,9 @@
 package com.evasanchez.kollect.uiclasses
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedButton
@@ -44,7 +45,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -53,8 +53,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.evasanchez.kollect.R
 import com.evasanchez.kollect.ViewModels.ProfileScreenViewModel
+import com.evasanchez.kollect.navigation.AppScreens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -69,6 +69,7 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
     val profilePicture: String by viewModel.profilePicture.observeAsState(initial = "https://firebasestorage.googleapis.com/v0/b/k-ollect-2bf8d.appspot.com/o/profilePics%2Fpfp_default.jpg?alt=media&token=5383fb77-e3fa-4e67-bae5-9415344fb777")
     val username: String by viewModel.username.observeAsState(initial = "Usuario")
     val username_def = username
+    val context = LocalContext.current as Activity
     LaunchedEffect(viewModel) {
         viewModel.getKGroupListRepository()
         viewModel.getProfilePicture()
@@ -80,14 +81,20 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold
         ) ) }, colors = TopAppBarDefaults.smallTopAppBarColors(MaterialTheme.colorScheme.secondaryContainer)) }) {
-        Column(modifier = Modifier.padding(16.dp).verticalScroll(scrollState)){
+        Column(modifier = Modifier
+            .padding(16.dp)
+            .verticalScroll(scrollState)){
             Spacer(modifier = Modifier.height(56.dp))
             ProfileImage(profilePicture,modifier = Modifier
                 .height(150.dp)
                 .align(Alignment.CenterHorizontally)
                 .padding(16.dp)
                 .clip(CircleShape)
-                .border(width = 1.dp, color = MaterialTheme.colorScheme.onBackground, shape = CircleShape)
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    shape = CircleShape
+                )
 
             )
             showUsername(username_def)
@@ -104,8 +111,14 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
                 viewModel.addIdolToUser(selectedKGroup, idolText)
             }
             successMessage?.let { showToast(message = it) }
+            Button(onClick = {
+                viewModel.logout(context)
+                Thread.sleep(1000)
+                navController.navigate("login_screen")
 
-
+            }){
+                Text(text = "Cerrar sesion")
+            }
         }
     }
     }
@@ -275,5 +288,6 @@ fun KgroupExposedDropdownMenuBox(kGroups: List<String>, onItemSelected: (String)
         }
     }
 }
+
 
 
