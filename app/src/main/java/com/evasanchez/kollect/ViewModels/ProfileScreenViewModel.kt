@@ -46,7 +46,6 @@ class ProfileScreenViewModel : ViewModel() {
     }
 
     init {
-        Log.d("A ver", "Entra en el init")
         val db = FirebaseFirestore.getInstance()
         db.firestoreSettings = FirebaseFirestoreSettings.Builder().build()
         viewModelScope.launch {
@@ -73,7 +72,7 @@ class ProfileScreenViewModel : ViewModel() {
                 subColReference!!.add(kGroupData)
                     .addOnSuccessListener {
                         showSuccessToast("Grupo añadido")
-                        Log.d("Hola", "Se ha creado el grupo")
+                        Log.d("Grupo añadido", "Se ha creado el grupo")
                         // Call getKGroupListRepository to refresh the list of groups
                         viewModelScope.launch(Dispatchers.IO) {
                             getKGroupListRepository()
@@ -81,7 +80,7 @@ class ProfileScreenViewModel : ViewModel() {
                         }
                     }
                     .addOnFailureListener {
-                        Log.d("Hola", "Algo ha malido sal")
+                        Log.d("Error", "Algo ha salido mal")
                     }
             }
         }
@@ -97,7 +96,7 @@ class ProfileScreenViewModel : ViewModel() {
                     "idol_name" to idol)
                 subColReference!!.add(idolData)
                     .addOnSuccessListener {
-                        Log.d("Hola", "Se ha añadido el idol, ${idolData}")
+                        Log.d("Idol añadido", "Se ha añadido el idol, ${idolData}")
                         showSuccessToast("Idol añadido")
                         // Call getKGroupListRepository to refresh the list of groups
                         viewModelScope.launch(Dispatchers.IO) {
@@ -105,7 +104,7 @@ class ProfileScreenViewModel : ViewModel() {
                         }
                     }
                     .addOnFailureListener {
-                        Log.d("Hola", "Algo ha malido sal")
+                        Log.d("Error", "Algo ha salido mal")
                     }
             }
         }
@@ -123,7 +122,7 @@ class ProfileScreenViewModel : ViewModel() {
             val documentPath = documentSnapshot.reference.path
             return db.document(documentPath).collection("Idols")
         } else {
-            throw NoSuchElementException("User not found")
+            throw NoSuchElementException("Error")
         }
     }
 
@@ -138,7 +137,7 @@ class ProfileScreenViewModel : ViewModel() {
             val documentPath = documentSnapshot.reference.path
             return db.document(documentPath).collection("Kgroups")
         } else {
-            throw NoSuchElementException("User not found")
+            throw NoSuchElementException("Error")
         }
     }
 
@@ -155,25 +154,21 @@ class ProfileScreenViewModel : ViewModel() {
                     for (document in querySnapshot.documents) {
                         val name = document.getString("group_name")
                         if (name != null) {
-                            Log.d("Hostia", name)
                             groupNames.add(name)
                         }
                     }
 
                     _allGroups.postValue(groupNames)
                 } catch (e: Exception) {
-                    Log.e("Firestore Query Error", e.message ?: "Unknown error")
                     _allGroups.postValue(emptyList())
                 }
             } else {
-                Log.d("Else", "subColReference is null")
                 _allGroups.postValue(emptyList())
             }
         }
     }
 
     suspend fun getProfilePicture(){
-        Log.d("GETPROFILEPIC", "Entra en getProfilePicture")
         val usersCollection = db.collection("usuario")
         viewModelScope.launch(Dispatchers.IO) {
             if (usersCollection != null) {
@@ -195,7 +190,6 @@ class ProfileScreenViewModel : ViewModel() {
 
 }
     suspend fun getUsername(){
-        Log.d("GETUSERNAME", "Entra en getUsername")
         val usersCollection = db.collection("usuario")
         viewModelScope.launch(Dispatchers.IO) {
             if (usersCollection != null) {
@@ -217,11 +211,66 @@ class ProfileScreenViewModel : ViewModel() {
     }
 
     fun logout(context: Activity) {
-
         auth.signOut()
         context.finishActivity(0)
     }
+    suspend fun getColeccionSubcollectionReference(userId: String): CollectionReference {
+        val usersCollection = db.collection("usuario")
+        val query = usersCollection.whereEqualTo("user_id", userId)
+        val querySnapshot = query.get().await()
 
+        if (!querySnapshot.isEmpty) {
+            val documentSnapshot = querySnapshot.documents.first()
+            val documentPath = documentSnapshot.reference.path
+            return db.document(documentPath).collection("Coleccion")
+        } else {
+            throw NoSuchElementException("User not found")
+        }
+    }
+    private val _showDialog = MutableLiveData<Boolean>()
+    val showDialog: LiveData<Boolean> = _showDialog
+    private val _dialogText = MutableLiveData<String>()
+    val dialogText: LiveData<String> = _dialogText
+    fun getTotalValuePcs() {
+        viewModelScope.launch {
+            val userID = FirebaseAuth.getInstance().currentUser?.uid
+            val subColReference = userID?.let { getColeccionSubcollectionReference(it) }
+
+
+            subColReference?.let {
+                val querySnapshot = it.get().await()
+                var total_value = querySnapshot.documents.sumOf { document ->
+                    val stringValue = document.getString("value") ?: "0.0"
+                    stringValue.toDoubleOrNull() ?: 0.0
+                }
+                _showDialog.postValue(true)
+                _dialogText.postValue("Valor total de las photocards en tu coleccion: ${total_value} €")
+            }
+
+        }
+
+    }
+
+    fun getTotalPcsInCollection() {
+        viewModelScope.launch {
+            val userID = FirebaseAuth.getInstance().currentUser?.uid
+            val subColReference = userID?.let { getColeccionSubcollectionReference(it) }
+
+
+            subColReference?.let {
+                val querySnapshot = it.get().await()
+                var count_pcs = querySnapshot.size()
+                _showDialog.postValue(true)
+                _dialogText.postValue("Número de Photocards en tu coleccion: ${count_pcs}")
+                }
+
+            }
+
+        }
+
+    fun onDismissDialog() {
+        _showDialog.value = false
+    }
 }
 
 

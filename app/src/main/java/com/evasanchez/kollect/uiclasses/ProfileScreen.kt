@@ -7,8 +7,10 @@ import android.app.Activity
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
@@ -26,9 +29,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
@@ -45,16 +50,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.evasanchez.kollect.R
 import com.evasanchez.kollect.ViewModels.ProfileScreenViewModel
-import com.evasanchez.kollect.navigation.AppScreens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -69,6 +76,11 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
     val profilePicture: String by viewModel.profilePicture.observeAsState(initial = "https://firebasestorage.googleapis.com/v0/b/k-ollect-2bf8d.appspot.com/o/profilePics%2Fpfp_default.jpg?alt=media&token=5383fb77-e3fa-4e67-bae5-9415344fb777")
     val username: String by viewModel.username.observeAsState(initial = "Usuario")
     val username_def = username
+    val showErrorDialog = viewModel.showDialog.observeAsState(false)
+    val dialogText = viewModel.dialogText.observeAsState("").value
+    if (showErrorDialog.value) {
+        AlertDialogProfileScreen(navController, viewModel ,dialogText)
+    }
     val context = LocalContext.current as Activity
     LaunchedEffect(viewModel) {
         viewModel.getKGroupListRepository()
@@ -99,6 +111,14 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
             )
             showUsername(username_def)
             Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp, modifier = Modifier.padding(16.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly){
+                OutlinedButton(onClick = { viewModel.getTotalValuePcs() }) {
+                    Text(text = "Mostrar valor total de la colección")
+                }
+                OutlinedButton(onClick = { viewModel.getTotalPcsInCollection() }) {
+                    Text(text = "Mostrar nº de photocards en la colección")
+                }
+            }
             GroupText()
             AddKGroup(viewModel, kGroup,{ viewModel.onKGroupChanged(it) })  {viewModel.addKgroupToUser(kGroup)}
             Spacer(Modifier.padding(16.dp))
@@ -288,6 +308,29 @@ fun KgroupExposedDropdownMenuBox(kGroups: List<String>, onItemSelected: (String)
         }
     }
 }
+
+@Composable
+fun AlertDialogProfileScreen(
+    navController: NavController,
+    viewModel: ProfileScreenViewModel,
+    dialogText: String
+){
+
+    AlertDialog(
+        onDismissRequest = {viewModel.onDismissDialog()},
+        confirmButton = {
+            TextButton(onClick = {
+                viewModel.onDismissDialog()
+                navController.popBackStack() }) {
+                Text(text = stringResource(id = R.string.ok_message))
+            }
+        },
+        title= { Text(text = "Valor total de photocards", color = MaterialTheme.colorScheme.onPrimaryContainer)},
+        text = {Text(text = dialogText, color = MaterialTheme.colorScheme.onPrimaryContainer)}
+    )
+
+}
+
 
 
 

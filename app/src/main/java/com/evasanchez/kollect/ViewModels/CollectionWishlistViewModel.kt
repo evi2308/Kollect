@@ -20,11 +20,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class CollectionWishlistViewModel: ViewModel() {
-    private val auth: FirebaseAuth = Firebase.auth
     val db = FirebaseFirestore.getInstance()
+
     private val _photocardsList = MutableLiveData<List<Photocard>>()
     val photocardsList: LiveData<List<Photocard>> = _photocardsList // LISTA PARA LAS PHOTOCARDS QUE PERTENECEN A LA COLECCION
+
     val usersCollection = db.collection("usuario")
+
     private val _showDialog = MutableLiveData<Boolean>()
     val showDialog: LiveData<Boolean> = _showDialog
 
@@ -33,19 +35,112 @@ class CollectionWishlistViewModel: ViewModel() {
 
     private val _dialogText = MutableLiveData<String>()
     val dialogText: LiveData<String> = _dialogText
+
+    private val _allGroups = MutableLiveData<List<String>>()
+    val allGroups: LiveData<List<String>> = _allGroups
+
+    private val _allIdols = MutableLiveData<List<String>>()
+    val allIdols: LiveData<List<String>> = _allIdols
+
+    private val _groupName =MutableLiveData<String>()
+    val groupName : LiveData<String> = _groupName
+
+
     init {
-        Log.d("A ver", "Entra en el init de HomeScreen")
+        Log.d("Init", "Entra en el init de HomeScreen")
         val db = FirebaseFirestore.getInstance()
         //viewModelScope.launch {
           //  getPhotocardsList()  }
 
     }
+    // Funciones para rellenar los dropdown para el filtro?
+
+    fun onGroupSelected(groupName: String) {
+        _groupName.value = groupName
+    }
+    suspend fun getKGroupListRepository() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val userID = FirebaseAuth.getInstance().currentUser?.uid
+            val subColReference = userID?.let { getSubcollectionReference(it) }
+
+            if (subColReference != null) {
+                try {
+                    val querySnapshot = subColReference.get().await()
+                    val groupNames = mutableListOf<String>()
+
+                    for (document in querySnapshot.documents) {
+                        val name = document.getString("group_name")
+                        if (name != null) {
+                            Log.d("Hostia", name)
+                            groupNames.add(name)
+                        }
+                    }
+
+                    _allGroups.postValue(groupNames)
+                } catch (e: Exception) {
+                    Log.e("Firestore Query Error", e.message ?: "Unknown error")
+                    _allGroups.postValue(emptyList())
+                }
+            } else {
+                Log.d("Else", "subColReference is null")
+                _allGroups.postValue(emptyList())
+            }
+        }
+    }
+
+    //Sacar lista de idols relacionadas con el grupo seleccionado
+    fun getIdolsBasedOnKgroup(selectedGroup: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val userID = FirebaseAuth.getInstance().currentUser?.uid
+            val subColReference = userID?.let { getIdolSubColReference(it) }
+
+            if (subColReference != null) {
+                try {
+                    val idolsQuery = subColReference.whereEqualTo("group_name", selectedGroup).get().await()
+                    val idolsNames = mutableListOf<String>()
+
+                    for (document in idolsQuery) {
+                        val name = document.getString("idol_name") // Assuming idol_name is the field you want to retrieve
+                        if (name != null) {
+                            Log.d("Nombre del idol", name)
+                            idolsNames.add(name)
+                        }
+                    }
+
+                    _allIdols.postValue(idolsNames)
+                } catch (e: Exception) {
+                    _allIdols.postValue(emptyList())
+                }
+            } else {
+                Log.d("Else", "subColReference es null")
+                _allIdols.postValue(emptyList())
+            }
+        }
+    }
+
+    suspend fun getIdolSubColReference(userId: String): CollectionReference {
+        val usersCollection = db.collection("usuario")
+        val query = usersCollection.whereEqualTo("user_id", userId)
+        val querySnapshot = query.get().await()
+
+        if (!querySnapshot.isEmpty) {
+            val documentSnapshot = querySnapshot.documents.first()
+            val documentPath = documentSnapshot.reference.path
+            return db.document(documentPath).collection("Idols")
+        } else {
+            throw NoSuchElementException("User not found")
+        }
+    }
+
+
     fun clearData() {
-        // Clear or reset your LiveData and any other relevant data
+        // Volver a poner a null los valores
         _photocardsList.postValue(emptyList())
         _selectedPhotocard.postValue(null)
         Log.d("VALORES BORRADOS?", _photocardsList.value.toString())
     }
+
+    //Sacar referencia a la subcoleccion "Coleccion" del usuario que esta logeado
     suspend fun getColeccionSubcollectionReference(userId: String): CollectionReference {
 
 
@@ -60,6 +155,8 @@ class CollectionWishlistViewModel: ViewModel() {
             throw NoSuchElementException("User not found")
         }
     }
+
+    //Sacar referencia a la subcoleccion "Wishlist" del usuario que esta logeado
 
     suspend fun getWishlistSubcollectionReference(userId: String): CollectionReference {
 
@@ -76,6 +173,7 @@ class CollectionWishlistViewModel: ViewModel() {
         }
     }
 
+    //Sacar lista de photocards de la coleccion del usuario logeado
     fun getPhotocardsCollectionList() {
         viewModelScope.launch(Dispatchers.IO) {
             val userID = FirebaseAuth.getInstance().currentUser?.uid
@@ -89,22 +187,23 @@ class CollectionWishlistViewModel: ViewModel() {
                     for (document in querySnapshot.documents) {
                         val photocardObj = document.toObject(Photocard::class.java)
                         if (photocardObj != null) {
-                            Log.d("Hostia", "photocard_url")
+                            Log.d("Photocard encontrada", "")
                             photocardObjList.add(photocardObj)
                         }
                     }
 
                     _photocardsList.postValue(photocardObjList)
                 } catch (e: Exception) {
-                    Log.e("Firestore Query Error", e.message ?: "Unknown error")
                     _photocardsList.postValue(emptyList())
                 }
             } else {
-                Log.d("Else", "subColReference is null")
+                Log.d("Else", "subColReference es null")
                 _photocardsList.postValue(emptyList())
             }
         }
     }
+
+    //Lista de photocards en la Wishlist del usuario
 
     fun getPhotocardsWishlistList() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -119,18 +218,17 @@ class CollectionWishlistViewModel: ViewModel() {
                     for (document in querySnapshot.documents) {
                         val photocardObj = document.toObject(Photocard::class.java)
                         if (photocardObj != null) {
-                            Log.d("Hostia", "photocard_url")
+                            Log.d("Photocard encontrada", "")
                             photocardObjList.add(photocardObj)
                         }
                     }
 
                     _photocardsWishlistList.postValue(photocardObjList)
                 } catch (e: Exception) {
-                    Log.e("Firestore Query Error", e.message ?: "Unknown error")
                     _photocardsWishlistList.postValue(emptyList())
                 }
             } else {
-                Log.d("Else", "subColReference is null")
+                Log.d("Else", "subColReference es null")
                 _photocardsWishlistList.postValue(emptyList())
             }
         }
@@ -141,10 +239,12 @@ class CollectionWishlistViewModel: ViewModel() {
     var selectedPhotocardDetail by mutableStateOf<Photocard?>(null)
         private set
 
+    //Sacar detalle de la photocard para la pantalla de detalles
     fun addPhotocardDetail(photocardDetailed: Photocard){
         selectedPhotocardDetail = photocardDetailed
     }
 
+    //Funcion para borrar las photocards tanto de la wishlist como de la coleccion, con la LastScreenRoute para saber desde que pantalla se ha llamado al metodo
     fun deletePhotocard (lastScreenRoute: String, photocardDetailed: Photocard){
         viewModelScope.launch(Dispatchers.IO) {
             if(lastScreenRoute == "home_screen"){
@@ -244,6 +344,20 @@ class CollectionWishlistViewModel: ViewModel() {
                 }
             }
 
+        }
+    }
+    suspend fun getSubcollectionReference(userId: String): CollectionReference {
+
+        val usersCollection = db.collection("usuario")
+        val query = usersCollection.whereEqualTo("user_id", userId)
+        val querySnapshot = query.get().await()
+
+        if (!querySnapshot.isEmpty) {
+            val documentSnapshot = querySnapshot.documents.first()
+            val documentPath = documentSnapshot.reference.path
+            return db.document(documentPath).collection("Kgroups")
+        } else {
+            throw NoSuchElementException("User not found")
         }
     }
     fun onDismissDialog() {

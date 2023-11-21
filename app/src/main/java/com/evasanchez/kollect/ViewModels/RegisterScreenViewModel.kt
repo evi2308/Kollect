@@ -51,7 +51,7 @@ class RegisterScreenViewModel: ViewModel() {
 
 
     private fun isValidPassword(password: String): Boolean = password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#\\$%^&+=!?¿¡*])(?=\\S+\$).{8,}\$".toRegex())
-    //private fun isValidEmail(email: String): Boolean = Patterns.EMAIL_ADDRESS.matcher(email).matches()
+
 
     private fun isValidEmail(email: String, onResult: (Boolean) -> Unit) {
         // Consulta para buscar en fireStore usuarios y sus emails. Si el email ya existe, no se habilita el botón
@@ -65,9 +65,9 @@ class RegisterScreenViewModel: ViewModel() {
                 val isEmailValid = querySnapshot.isEmpty
                 onResult(isEmailValid)
             }
-            .addOnFailureListener { ex ->
+            .addOnFailureListener { e ->
                 //Ante cualquier error, se envia igualmente un false
-                Log.d("Error", "Ha ocurrido un error : $ex")
+                Log.d("Error", "Ha ocurrido un error : $e")
                 onResult(false)
             }
     }
@@ -110,9 +110,9 @@ class RegisterScreenViewModel: ViewModel() {
         ).userToMap()
         FirebaseFirestore.getInstance().collection("usuario").add(user)
             .addOnSuccessListener {
-            Log.d("AÑADIDO", "ESTO HA FUNCADO")
+            Log.d("Usuario añadido a Firebase", "Usuario añadido a Firebase")
         }.addOnFailureListener{
-            Log.d("NO AÑADIDO", "Esto es una mierda")
+            Log.d("Error", "No se ha añadido el usuario a Firebase")
         }
     }
 

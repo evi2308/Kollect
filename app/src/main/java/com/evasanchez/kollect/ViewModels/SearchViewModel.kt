@@ -65,7 +65,7 @@ class SearchViewModel : ViewModel() {
 
                 _users.value = userList
             }catch (e : Exception){
-                Log.e("Error en la busqueda", "Algo ha malido sal")
+                Log.e("Error en la busqueda", "Algo ha salido mal")
             }
         }
     }
@@ -102,7 +102,6 @@ class SearchViewModel : ViewModel() {
                     for (document in querySnapshot.documents) {
                         val photocardObj = document.toObject(Photocard::class.java)
                         if (photocardObj != null) {
-                            Log.d("Hostia", "photocard_url")
                             photocardObjList.add(photocardObj)
                         }
                     }

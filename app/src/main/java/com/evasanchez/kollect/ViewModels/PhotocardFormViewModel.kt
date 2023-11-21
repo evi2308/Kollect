@@ -164,7 +164,7 @@ fun isPrioChanged(isPrio: Boolean){
   }
  }
 
- // Function to get a list of documents in the subcollection
+ // Sacar los grupos para añadirlos al DropDownMenu
  suspend fun getKGroupListRepository() {
   viewModelScope.launch(Dispatchers.IO) {
    val subColReference = userID?.let { getSubcollectionReference(it) }
@@ -206,7 +206,7 @@ fun isPrioChanged(isPrio: Boolean){
      for (document in idolsQuery) {
       val name = document.getString("idol_name") // Assuming idol_name is the field you want to retrieve
       if (name != null) {
-       Log.d("Hostia", name)
+       Log.d("Nombre del idol", name)
        idolsNames.add(name)
       }
      }
@@ -228,7 +228,7 @@ fun isPrioChanged(isPrio: Boolean){
    var randomNum: String = Random.nextInt().toString()
    var photocardNameStorage: String = "Photocard" + randomNum
    Log.d("Nombre de la foto", "Nombre : ${photocardNameStorage}")
-  //Referencia a la photocard
+  //Referencia a la photocard en Cloud Storage
    val photocardRef = storageRef.child("photocardPics/${photocardNameStorage}")
    val uri = photocardUri.value
    if(uri != null){
@@ -249,6 +249,7 @@ fun isPrioChanged(isPrio: Boolean){
     }
 
    }else{
+    // Imagen Default. Aun así a la photocard se le asignará un ID aunque la imagen sea la photocard por defecto
     val defaultImageRef = storageRef.child("photocardPics/photocard_default.jpg")
     defaultImageRef.downloadUrl.addOnSuccessListener {downloadUri->
      val defaultImageURL = downloadUri.toString()
@@ -282,7 +283,6 @@ fun isPrioChanged(isPrio: Boolean){
       .addOnSuccessListener {
        Log.d("HURRA", "SE HA AÑADIDO LA PHOTOCARD(aparentemente)")
        _showDialog.postValue(true)
-       repository.addPhotocardToMasterist(photocard)
       }
       .addOnFailureListener {
        Log.d("Jope", "Algo ha salido mal me voy a matar")
@@ -293,17 +293,17 @@ fun isPrioChanged(isPrio: Boolean){
     if (subColRefColeccion != null){
      subColRefColeccion.add(photocardMap)
       .addOnSuccessListener {
-       Log.d("HURRA", "SE HA AÑADIDO LA PHOTOCARD(aparentemente)")
+       Log.d("Photocard Añadida", "Photocard añadida")
        _showDialog.postValue(true)
-       repository.addPhotocardToMasterist(photocard)
       }
       .addOnFailureListener {
-       Log.d("Jope", "Algo ha salido mal me voy a matar")
+       Log.d("Fallo", "Algo ha salido mal")
       }
     }
    }
  }
 
+ //Cambiar el valor para ocultar el Dialogo
  fun onDismissDialog() {
   _showDialog.value = false
  }

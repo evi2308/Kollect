@@ -59,9 +59,9 @@ class MainActivity : ComponentActivity() {
                     else -> false
                 }
                 showBottomBar = when (navBackStackEntry?.destination?.route) {
-                    "login_screen" -> false // on this screen bottom bar should be hidden
-                    "register_screen" -> false // here too
-                    else -> true // in all other cases show bottom bar
+                    "login_screen" -> false
+                    "register_screen" -> false
+                    else -> true
                 }
                 Scaffold(
                     content = { paddingValues ->
