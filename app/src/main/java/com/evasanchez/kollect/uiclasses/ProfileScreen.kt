@@ -20,6 +20,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
@@ -28,6 +31,8 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -73,9 +78,9 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
     val kGroups : List<String> by viewModel.allGroups.observeAsState(initial = listOf())
     var selectedKGroup by remember { mutableStateOf(if (kGroups.isNotEmpty()) kGroups[0] else "") }
     val successMessage: String? by viewModel.successMessage.observeAsState()
-    val profilePicture: String by viewModel.profilePicture.observeAsState(initial = "https://firebasestorage.googleapis.com/v0/b/k-ollect-2bf8d.appspot.com/o/profilePics%2Fpfp_default.jpg?alt=media&token=5383fb77-e3fa-4e67-bae5-9415344fb777")
-    val username: String by viewModel.username.observeAsState(initial = "Usuario")
-    val username_def = username
+    val profilePicture: String by viewModel.profilePicture.observeAsState(initial = "") // Esto deberia de poder quitarlo
+    val username: String by viewModel.username.observeAsState(initial = "")
+    val usernameDef = username
     val showErrorDialog = viewModel.showDialog.observeAsState(false)
     val dialogText = viewModel.dialogText.observeAsState("").value
     if (showErrorDialog.value) {
@@ -88,11 +93,32 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
         viewModel.getUsername()
     }
     val scrollState = rememberScrollState()
-    Scaffold(topBar ={TopAppBar(title = { Text(text = "MI PERFIL",
-        style = TextStyle(MaterialTheme.colorScheme.onSecondaryContainer,
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Bold
-        ) ) }, colors = TopAppBarDefaults.smallTopAppBarColors(MaterialTheme.colorScheme.secondaryContainer)) }) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "MI PERFIL",
+                        style = TextStyle(
+                            MaterialTheme.colorScheme.onSecondaryContainer,
+                            fontSize = 30.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                },
+                actions = {
+                    IconButton(onClick = {
+                        navController.navigate("login_screen")}) {
+                        Icon(Icons.Filled.ExitToApp, contentDescription = "Cerrar sesión")
+                    }
+                    IconButton(onClick = { /* Handle the click */ }) {
+                        Icon(Icons.Filled.Settings, contentDescription = "Configuración del perfil")
+                    }
+                },
+                colors = TopAppBarDefaults.smallTopAppBarColors(MaterialTheme.colorScheme.secondaryContainer)
+            )
+        }
+    ) {
         Column(modifier = Modifier
             .padding(16.dp)
             .verticalScroll(scrollState)){
@@ -109,21 +135,29 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
                 )
 
             )
-            showUsername(username_def)
+            showUsername(usernameDef)
             Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp, modifier = Modifier.padding(16.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly){
-                OutlinedButton(onClick = { viewModel.getTotalValuePcs() }) {
-                    Text(text = "Mostrar valor total de la colección")
+            Text(text = "Haz click en los botones para ver las estadísticas de tu colección", textAlign = TextAlign.Left,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(8.dp))
+            Row(modifier = Modifier.fillMaxWidth()){
+                ElevatedButton(onClick = { viewModel.getTotalValuePcs() }, modifier = Modifier.padding(8.dp)) {
+                    Text(text = "Mostrar valor total \n de la colección")
                 }
-                OutlinedButton(onClick = { viewModel.getTotalPcsInCollection() }) {
-                    Text(text = "Mostrar nº de photocards en la colección")
+                ElevatedButton(onClick = { viewModel.getTotalPcsInCollection() }, modifier = Modifier.padding(8.dp)) {
+                    Text(text = "Mostrar total de photocards en la colección")
                 }
             }
+            Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp, modifier = Modifier.padding(16.dp))
             GroupText()
             AddKGroup(viewModel, kGroup,{ viewModel.onKGroupChanged(it) })  {viewModel.addKgroupToUser(kGroup)}
-            Spacer(Modifier.padding(16.dp))
+            Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp, modifier = Modifier.padding(16.dp))
             Text(text = "Añade un Idol a tu colección",
-                modifier = Modifier.fillMaxWidth())
+                textAlign = TextAlign.Left,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(8.dp))
             KgroupExposedDropdownMenuBox(kGroups){ selectedText ->
                 selectedKGroup = selectedText
             }

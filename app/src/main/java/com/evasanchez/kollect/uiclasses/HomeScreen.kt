@@ -94,33 +94,33 @@ fun HomeScreen(navController: NavController, viewModel: CollectionWishlistViewMo
                     viewModel.getIdolsBasedOnKgroup(selectedText)
                     viewModel.onGroupSelected(selectedKGroup)
                 }
-
-                Button(onClick = { /*TODO*/ }) {
-                    Text(text = "Filtrar")
-                }
-                Button(onClick = { /*TODO*/ }) {
-                    Text(text = "Borrar filtro")
-                }
-
             }
 
         }
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(128.dp),
-            // content padding
-            contentPadding = PaddingValues(
-                start = 12.dp,
-                top = 80.dp,
-                end = 12.dp,
-                bottom = 16.dp
-            ),
-            content = {
-                items(collectionPhotocards.size) { index ->
-                    val photocard = collectionPhotocards[index]
-                    photocardCardComponent(selectedPhotocard,viewModel,navController, photocard = collectionPhotocards[index]){viewModel.addPhotocardDetail(photocard)}
+        Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 48.dp) // Adjust padding as needed
+        ){
+            Spacer(modifier = Modifier.padding(50.dp))
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(128.dp),
+                // content padding
+                contentPadding = PaddingValues(
+                    start = 12.dp,
+                    top = 80.dp,
+                    end = 12.dp,
+                    bottom = 16.dp
+                ),
+                content = {
+                    items(collectionPhotocards.size) { index ->
+                        val photocard = collectionPhotocards[index]
+                        photocardCardComponent(selectedPhotocard,viewModel,navController, photocard = collectionPhotocards[index]){viewModel.addPhotocardDetail(photocard)}
+                    }
                 }
-            }
-        )
+            )
+        }
+
     }
 
 }

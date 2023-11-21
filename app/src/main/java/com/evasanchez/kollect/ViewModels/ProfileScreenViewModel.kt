@@ -178,7 +178,7 @@ class ProfileScreenViewModel : ViewModel() {
                         val pfpURL = document.getString("pfpURL")
                         if (pfpURL != null) {
                             Log.d("pfp", pfpURL)
-                            _username.postValue(pfpURL)
+                            _profilePicture.postValue(pfpURL)
                         }
                     }
                 } catch (e: Exception) {
