@@ -6,9 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.evasanchez.kollect.data.Photocard
-import com.evasanchez.kollect.data.PhotocardRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
@@ -23,7 +21,6 @@ import kotlinx.coroutines.tasks.await
 import kotlin.random.Random
 
 class PhotocardFormViewModel: ViewModel() {
-   val repository = PhotocardRepository()
    val db = Firebase.firestore
    private val auth: FirebaseAuth = Firebase.auth
    val userID = auth.currentUser?.uid
@@ -281,11 +278,11 @@ fun isPrioChanged(isPrio: Boolean){
     if (subColRefWl != null) {
      subColRefWl.add(photocardMap)
       .addOnSuccessListener {
-       Log.d("HURRA", "SE HA AÑADIDO LA PHOTOCARD(aparentemente)")
+       Log.d("Exito", "Photocard añadida")
        _showDialog.postValue(true)
       }
       .addOnFailureListener {
-       Log.d("Jope", "Algo ha salido mal me voy a matar")
+       Log.d("Error", "Error: ${it.message}")
       }
     }
    }else{

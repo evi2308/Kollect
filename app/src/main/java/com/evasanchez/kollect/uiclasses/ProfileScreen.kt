@@ -165,14 +165,7 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
                 viewModel.addIdolToUser(selectedKGroup, idolText)
             }
             successMessage?.let { showToast(message = it) }
-            Button(onClick = {
-                viewModel.logout(context)
-                Thread.sleep(1000)
-                navController.navigate("login_screen")
 
-            }){
-                Text(text = "Cerrar sesion")
-            }
         }
     }
     }

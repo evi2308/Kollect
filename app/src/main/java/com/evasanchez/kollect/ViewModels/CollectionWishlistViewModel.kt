@@ -54,7 +54,9 @@ class CollectionWishlistViewModel: ViewModel() {
 
     }
     // Funciones para rellenar los dropdown para el filtro?
-
+    fun showInfoToast(message: String) {
+        //_InfoMessage.postValue(message)
+    }
     fun onGroupSelected(groupName: String) {
         _groupName.value = groupName
     }
@@ -172,7 +174,6 @@ class CollectionWishlistViewModel: ViewModel() {
             throw NoSuchElementException("User not found")
         }
     }
-
     //Sacar lista de photocards de la coleccion del usuario logeado
     fun getPhotocardsCollectionList() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -298,8 +299,10 @@ class CollectionWishlistViewModel: ViewModel() {
                 if (!photocardQuery.isEmpty) {
                     val photocardData = photocardQuery.documents.first().data
                     val photocardId = photocardQuery.documents.first().id
+                    photocardData?.set("status", "Wishlist ") //Borrar si no soluciona el tema
                     subColReferenceColeccion.document(photocardId).delete().addOnSuccessListener {
-                        Log.d("Photocard Eliminada", "Ole se ha eliminado toca moverla")
+                        Log.d("Photocard Eliminada", "Photocard Eliminada, se moverá")
+
                         subColReferenceWishlist.add(photocardData!!).addOnSuccessListener {
                             Log.d("Photocard Movida", "Photocard Movida a la Wishlist Exitosamente")
                             _showDialog.postValue(true)
@@ -317,33 +320,42 @@ class CollectionWishlistViewModel: ViewModel() {
 
         }
     }
-    fun moveFromWishlisttoCol(photocardDetailed: Photocard){
+    fun moveFromWishlisttoCol(photocardDetailed: Photocard) {
         viewModelScope.launch(Dispatchers.IO) {
             val userID = FirebaseAuth.getInstance().currentUser?.uid
             val subColReferenceColeccion = userID?.let { getColeccionSubcollectionReference(it) }
             val subColReferenceWishlist = userID?.let { getWishlistSubcollectionReference(it) }
+
             if (subColReferenceColeccion != null && subColReferenceWishlist != null) {
                 val photocardQuery = subColReferenceWishlist.whereEqualTo("photocard_id", photocardDetailed.photocardId).get().await()
+
                 if (!photocardQuery.isEmpty) {
-                    val photocardData = photocardQuery.documents.first().data
-                    val photocardId = photocardQuery.documents.first().id
-                    subColReferenceWishlist.document(photocardId).delete().addOnSuccessListener {
+                    val photocardDocument = photocardQuery.documents.first()
+
+                    // Modify the local values
+                    val photocardData = photocardDocument.data?.toMutableMap()
+                    photocardData?.set("is_otw", false)
+                    photocardData?.set("status", "Coleccion") //Borrar si no soluciona el tema
+                    // Update the Firestore document
+                    subColReferenceWishlist.document(photocardDocument.id).delete().addOnSuccessListener {
                         Log.d("Photocard Eliminada", "Ole se ha eliminado toca moverla")
+
                         subColReferenceColeccion.add(photocardData!!).addOnSuccessListener {
                             Log.d("Photocard Movida", "Photocard movida a tu coleccion exitosamente")
                             _showDialog.postValue(true)
                             _dialogText.postValue("Photocard movida a tu coleccion exitosamente")
+                        }.addOnFailureListener {
+                            Log.d("Error", "Error al agregar la photocard a la colección")
+                            _showDialog.postValue(true)
+                            _dialogText.postValue("Algo ha salido mal, inténtalo de nuevo más tarde")
                         }
-                    }.addOnFailureListener{
-                        Log.d("Error", "Error al borrar la phtotocard")
+                    }.addOnFailureListener {
+                        Log.d("Error", "Error al borrar la photocard de la wishlist")
                         _showDialog.postValue(true)
                         _dialogText.postValue("Algo ha salido mal, inténtalo de nuevo más tarde")
                     }
-
-
                 }
             }
-
         }
     }
     suspend fun getSubcollectionReference(userId: String): CollectionReference {
@@ -364,4 +376,127 @@ class CollectionWishlistViewModel: ViewModel() {
         _showDialog.value = false
     }
 
+    //ARREGLAR
+    fun updatePrioStatus(photocard: Photocard) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val userID = FirebaseAuth.getInstance().currentUser?.uid
+
+            if (photocard.status == "Wishlist") {
+                val subColReference = userID?.let { getWishlistSubcollectionReference(it) }
+                if (subColReference != null) {
+                    val photocardQuery = subColReference.whereEqualTo("photocard_id", photocard.photocardId).get().await()
+
+                    val firstDocument = photocardQuery.documents.firstOrNull()
+                    if (firstDocument != null) {
+                        val photocardData = firstDocument.data
+                        if (photocardData != null) {
+                            var new_value = false
+                            if (photocardData["is_prio"] == true) {
+                                new_value = false
+                            }
+                            if (photocardData["is_prio"] == false) {
+                                new_value = true
+                            }
+                            photocardData["is_prio"] = new_value
+                            subColReference.document(firstDocument.id).update(photocardData)
+                        }
+                    }
+                }
+            }
+
+            if (photocard.status == "Coleccion") {
+                val subColReference = userID?.let { getColeccionSubcollectionReference(it) }
+                if (subColReference != null) {
+                    val photocardQuery = subColReference.whereEqualTo("photocard_id", photocard.photocardId).get().await()
+
+                    val firstDocument = photocardQuery.documents.firstOrNull()
+                    if (firstDocument != null) {
+                        val photocardData = firstDocument.data
+                        if (photocardData != null) {
+                            var new_value = false
+                            if (photocardData["is_prio"] == true) {
+                                new_value = false
+                            }
+                            if (photocardData["is_prio"] == false) {
+                                new_value = true
+                            }
+                            photocardData["is_prio"] = new_value
+                            subColReference.document(firstDocument.id).update(photocardData)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun updateOTWStatus(photocard: Photocard) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val userID = FirebaseAuth.getInstance().currentUser?.uid
+            if(photocard.status == "Wishlist"){
+                val subColReference = userID?.let { getWishlistSubcollectionReference(it) }
+                if (subColReference != null) {
+                    val photocardQuery = subColReference.whereEqualTo("photocard_id", photocard.photocardId).get().await()
+
+                    val document = photocardQuery.documents.firstOrNull()
+                    if (document != null) {
+                        val photocardData = document.data
+                        if (photocardData != null) {
+                            var new_value = false
+                            if (photocardData["is_otw"] == true) {
+                                new_value = false
+                            }
+                            if (photocardData["is_otw"] == false) {
+                                new_value = true
+                            }
+                            photocardData["is_otw"] = new_value
+                            subColReference.document(document.id).update(photocardData)
+                            if(photocardData["is_otw"] as Boolean){
+                                showToast("La photocard se ha marcado como OTW ")
+                            }
+                            else{
+                                showToast("La photocard ya no está OTW ")
+                            }
+                        }
+                    }
+                }
+            }
+            if (photocard.status == "Coleccion") {
+                val subColReference = userID?.let { getColeccionSubcollectionReference(it) }
+                if (subColReference != null) {
+                    val photocardQuery = subColReference.whereEqualTo("photocard_id", photocard.photocardId).get().await()
+                    val document = photocardQuery.documents.firstOrNull()
+                    if (document != null) {
+                        val photocardData = document.data
+                        if (photocardData != null) {
+                            var new_value = false
+                            if (photocardData["is_otw"] == true) {
+                                new_value = false
+                            }
+                            if (photocardData["is_otw"] == false) {
+                                new_value = true
+                            }
+                            photocardData["is_otw"] = new_value
+                            subColReference.document(document.id).update(photocardData)
+                            if(photocardData["is_otw"] as Boolean){
+                                showToast("La photocard se ha marcado como OTW ")
+                            }
+                            else{
+                                showToast("La photocard ya no está OTW ")
+                            }
+
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+    private val _toastMessage = MutableLiveData<String>()
+    val toastMessage: LiveData<String> = _toastMessage
+    fun showToast(message: String) {
+        _toastMessage.postValue(message)
+    }
 }
+
+

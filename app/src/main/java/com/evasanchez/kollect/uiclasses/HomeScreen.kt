@@ -2,10 +2,11 @@ package com.evasanchez.kollect.uiclasses
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -13,27 +14,25 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Mail
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Filter
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -59,10 +58,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.evasanchez.kollect.R
 import com.evasanchez.kollect.ViewModels.CollectionWishlistViewModel
@@ -80,15 +79,47 @@ fun HomeScreen(navController: NavController, viewModel: CollectionWishlistViewMo
         viewModel.getKGroupListRepository()
 
     }
-    val selectedPhotocard by viewModel.selectedPhotocard.observeAsState() //Photocard que quiero enviar a la pantalla de detalle
-    Scaffold(topBar ={TopAppBar(title = { Text(text = "MI COLECCIÓN",
+    var showFilterDialog by remember {
+        mutableStateOf(false)
+    }
+    /*if (showFilterDialog) {
+        if (showFilterDialog) {
+            FilterDialog(
+                viewModel = viewModel,
+                showFilterDialog = showFilterDialog,
+                selectedKgroup = selectedKGroup,
+                onItemSelected = {
+                    // Handle item selected action
+                    // This is the function you want to execute when "Aplicar" is clicked
+                    // For now, you can leave it empty if you don't have specific actions
+                }
+    }*/
+
+    Scaffold(topBar ={TopAppBar(title = { Text(text = "COLECCIÓN",
         style = TextStyle(MaterialTheme.colorScheme.onSecondaryContainer,
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold
-        ) ) }, colors = TopAppBarDefaults.smallTopAppBarColors(MaterialTheme.colorScheme.secondaryContainer)) }) {
-        Column(modifier = Modifier
+        ) ) },actions = {
+        IconButton(onClick = { showFilterDialog = true }, modifier = Modifier.align(Alignment.CenterVertically)) {
+            Column {
+                Icon(Icons.Filled.Filter, contentDescription = "Filtrar", modifier = Modifier.size(20.dp) )
+                Text(text = "Filtro")
+            }
+
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        IconButton(onClick = { viewModel.getPhotocardsCollectionList() },modifier = Modifier.align(Alignment.CenterVertically)) {
+            Column {
+                Icon(Icons.Filled.Clear, contentDescription = "Borrar filtro", modifier = Modifier.size(20.dp) )
+                Text(text = "Clear")
+            }
+
+        }
+
+    }, colors = TopAppBarDefaults.smallTopAppBarColors(MaterialTheme.colorScheme.secondaryContainer)) }) {
+       /* Column(modifier = Modifier
             .fillMaxWidth()) {
-            Row(modifier = Modifier.padding(16.dp)) {
+            Row(modifier = Modifier.padding(16.dp), Arrangement.SpaceEvenly) {
                 KgroupExposedDropdownMenuBoxFilter(kGroups){ selectedText ->
                     selectedKGroup = selectedText
                     viewModel.getIdolsBasedOnKgroup(selectedText)
@@ -96,26 +127,24 @@ fun HomeScreen(navController: NavController, viewModel: CollectionWishlistViewMo
                 }
             }
 
-        }
+        }*/
         Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = 48.dp) // Adjust padding as needed
+            .padding(top = 80.dp) // Adjust padding as needed
         ){
             Spacer(modifier = Modifier.padding(50.dp))
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(128.dp),
-                // content padding
                 contentPadding = PaddingValues(
                     start = 12.dp,
-                    top = 80.dp,
                     end = 12.dp,
                     bottom = 16.dp
                 ),
                 content = {
                     items(collectionPhotocards.size) { index ->
                         val photocard = collectionPhotocards[index]
-                        photocardCardComponent(selectedPhotocard,viewModel,navController, photocard = collectionPhotocards[index]){viewModel.addPhotocardDetail(photocard)}
+                        photocardCardComponent(navController, photocard = collectionPhotocards[index]){viewModel.addPhotocardDetail(photocard)}
                     }
                 }
             )
@@ -130,8 +159,6 @@ fun HomeScreen(navController: NavController, viewModel: CollectionWishlistViewMo
 
 @Composable
 fun photocardCardComponent(
-    selectedPhotocard: Photocard?,
-    viewModel: CollectionWishlistViewModel,
     navController: NavController,
     photocard: Photocard,
     addPhotocardDetail: (Photocard) -> Unit
@@ -258,7 +285,52 @@ fun KgroupExposedDropdownMenuBoxFilter(kGroups: List<String>, onItemSelected: (S
             }
         }
     }
+
 }
 
 
 
+/*
+@Composable
+fun FilterAlertDialog(
+    viewModel: CollectionWishlistViewModel, showFilterDialog: Boolean, selectedKgroup: String, ){
+    Dialog(
+        onDismissRequest = { var showFilterDialog = false },
+        properties = DialogProperties(dismissOnClickOutside = true),
+        content = {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .width(300.dp)
+            ) {
+                KgroupExposedDropdownMenuBoxFilter(kGroups){ selectedText ->
+                    selectedKGroup = selectedText
+                    viewModel.getIdolsBasedOnKgroup(selectedText)
+                    viewModel.onGroupSelected()
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Button(
+                        onClick = {
+                            onItemSelected()
+                            var showFilterDialog = false
+                        },
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
+                        Text("Aplicar")
+                    }
+                    Button(
+                        onClick = {  var showFilterDialog = false }
+                    ) {
+                        Text("Cancelar")
+                    }
+                }
+            }
+        }
+    )
+}*/
