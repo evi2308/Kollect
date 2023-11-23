@@ -17,6 +17,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +35,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -55,6 +60,7 @@ fun PhotocardDetail(navController: NavController, viewModel: CollectionWishlistV
         if (selectedPhotocard != null ){
             Log.d("LaunchedEffect PhotocardDetail", "${selectedPhotocard.photocardId}")
         }
+
 
     }
     Column(
@@ -115,55 +121,60 @@ fun PhotocardDetail(navController: NavController, viewModel: CollectionWishlistV
                     .weight(1f)
                     .padding(16.dp)
             ) {
-                selectedPhotocard?.albumName?.let { Text(it) }
-                selectedPhotocard?.groupName?.let { Text(it) }
-                selectedPhotocard?.idolName?.let { Text(it) }
-                Text(text = "ES PRIO: ${selectedPhotocard?.isPrio}")
-                Text(text = "ESTA OTW: ${selectedPhotocard?.isOtw}")
+                Text(
+                    text = "DATOS DE LA PHOTOCARD",
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.size(16.dp))
+                Text(text = "GRUPO: ${selectedPhotocard?.groupName}")
+                Text(text = "IDOL: ${selectedPhotocard?.idolName}")
+                Text(text = "ALBUM: ${selectedPhotocard?.albumName}")
+                Text(text = "TIPO: ${selectedPhotocard?.type}")
+                Text(text = "VERSION: ${selectedPhotocard?.photocardVersion}")
+                Text(text = "PRECIO: ${selectedPhotocard?.value}")
             }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            // Add more details or actions to the right of the Photocard here
+            
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Button(
+            ElevatedButton(
                 onClick = {
                     if (lastScreen != null) {
                         viewModel.deletePhotocard(lastScreen, selectedPhotocard!!)
                     }
-                }
-            ) {
-                Text(text = "ELIMINAR PHOTOCARD")
-            }
-
-            Button(
-                onClick = {
-                    viewModel.moveFromColtoWishlist(selectedPhotocard!!)
                 },
-                enabled = isLastScreenCollecion(lastScreen)
+                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error)
             ) {
-                Text(text = "MOVER PHOTOCARD A WISHLIST")
+                Text(text = "BORRAR")
+            }
+            if (isLastScreenCollecion(lastScreen)){
+                Button(
+                    onClick = {
+                        viewModel.moveFromColtoWishlist(selectedPhotocard!!)
+                    },
+                    enabled = isLastScreenCollecion(lastScreen)
+                ) {
+                    Text(text = "MOVER A WISHLIST")
+                }
+            }
+            if (!isLastScreenCollecion(lastScreen)){
+                Button(
+                    onClick = {
+                        viewModel.moveFromWishlisttoCol(selectedPhotocard!!)
+                    },
+                    enabled = !isLastScreenCollecion(lastScreen)
+                ) {
+                    Text(text = "MOVER A COLECCION")
+                }
             }
         }
 
-        Button(
-            onClick = {
-                viewModel.moveFromWishlisttoCol(selectedPhotocard!!)
-            },
-            enabled = !isLastScreenCollecion(lastScreen)
-        ) {
-            Text(text = "MOVER PHOTOCARD A COLECCION")
-        }
+
     }
     toastMessage?.let { showDetailToast(message = it) }
 }
@@ -198,7 +209,7 @@ fun AlertDialogPhotocardDetail(
 
 @Composable
 fun showDetailToast(message: String) {
-    Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
+    Toast.makeText(LocalContext.current, message, Toast.LENGTH_LONG).show()
 }
 
 

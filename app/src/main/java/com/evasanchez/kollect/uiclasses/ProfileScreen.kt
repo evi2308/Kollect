@@ -347,8 +347,7 @@ fun AlertDialogProfileScreen(
         onDismissRequest = {viewModel.onDismissDialog()},
         confirmButton = {
             TextButton(onClick = {
-                viewModel.onDismissDialog()
-                navController.popBackStack() }) {
+                viewModel.onDismissDialog() }) {
                 Text(text = stringResource(id = R.string.ok_message))
             }
         },

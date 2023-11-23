@@ -73,14 +73,12 @@ class CollectionWishlistViewModel: ViewModel() {
                     for (document in querySnapshot.documents) {
                         val name = document.getString("group_name")
                         if (name != null) {
-                            Log.d("Hostia", name)
                             groupNames.add(name)
                         }
                     }
 
                     _allGroups.postValue(groupNames)
                 } catch (e: Exception) {
-                    Log.e("Firestore Query Error", e.message ?: "Unknown error")
                     _allGroups.postValue(emptyList())
                 }
             } else {
@@ -399,6 +397,12 @@ class CollectionWishlistViewModel: ViewModel() {
                             }
                             photocardData["is_prio"] = new_value
                             subColReference.document(firstDocument.id).update(photocardData)
+                            if(photocardData["is_prio"] as Boolean){
+                                showToast("La photocard se ha marcado como prioridad ")
+                            }
+                            else{
+                                showToast("La photocard ya no está marcada como prioridad ")
+                            }
                         }
                     }
                 }
@@ -422,6 +426,12 @@ class CollectionWishlistViewModel: ViewModel() {
                             }
                             photocardData["is_prio"] = new_value
                             subColReference.document(firstDocument.id).update(photocardData)
+                            if(photocardData["is_prio"] as Boolean){
+                                showToast("La photocard se ha marcado como prioridad ")
+                            }
+                            else{
+                                showToast("La photocard ya no está marcada como prioridad ")
+                            }
                         }
                     }
                 }

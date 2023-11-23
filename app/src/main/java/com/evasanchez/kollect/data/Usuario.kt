@@ -27,7 +27,6 @@ data class Usuario(
     fun doesMatchSearchQuery(query: String): Boolean {
         val matchingCombinations = listOf(
             "$username",
-            "$email",
             "${username.first()}"
         )
         return matchingCombinations.any{

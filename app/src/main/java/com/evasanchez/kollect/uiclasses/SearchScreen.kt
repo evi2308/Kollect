@@ -84,15 +84,7 @@ fun SearchScreen(navController: NavController, viewModel: SearchViewModel){
                                         modifier = Modifier.fillMaxSize()
                                     )
                                     Box(modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(
-                                            Brush.verticalGradient(
-                                                colors = listOf(
-                                                    Color.Transparent,
-                                                    Color.Black
-                                                ), startY = 300f
-                                            )
-                                        ))
+                                        .fillMaxSize())
                                     Box(modifier = Modifier
                                         .fillMaxSize()
                                         .padding(8.dp), contentAlignment = Alignment.BottomStart) {

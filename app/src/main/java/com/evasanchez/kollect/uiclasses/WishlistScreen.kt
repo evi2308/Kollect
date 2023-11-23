@@ -51,6 +51,7 @@ import com.evasanchez.kollect.navigation.AppScreens
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WishlistScreen(navController: NavHostController, viewModel: CollectionWishlistViewModel) {
+    val toastMessage: String? by viewModel.toastMessage.observeAsState()
     val collectionPhotocards by viewModel.photocardsWishlistList.observeAsState(emptyList())
     LaunchedEffect(viewModel) {
         viewModel.getPhotocardsWishlistList()
@@ -80,6 +81,7 @@ fun WishlistScreen(navController: NavHostController, viewModel: CollectionWishli
             }
         )
     }
+    toastMessage?.let { showDetailToast(message = it) }
 
 }
 
