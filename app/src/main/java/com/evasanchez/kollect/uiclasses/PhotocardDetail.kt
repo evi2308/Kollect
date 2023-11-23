@@ -46,6 +46,7 @@ import com.evasanchez.kollect.ViewModels.CollectionWishlistViewModel
 
 @Composable
 fun PhotocardDetail(navController: NavController, viewModel: CollectionWishlistViewModel) {
+    var editMode = viewModel.editMode.observeAsState(false)
     val toastMessage: String? by viewModel.toastMessage.observeAsState()
     // Observa si se debe mostrar el AlertDialog
     val showErrorDialog = viewModel.showDialog.observeAsState(false)
@@ -63,119 +64,140 @@ fun PhotocardDetail(navController: NavController, viewModel: CollectionWishlistV
 
 
     }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Box(
+    if(editMode.value == false){
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
-            AsyncImage(
-                model = selectedPhotocard?.photocardURL,
-                contentDescription = "Photocard seleccionada",
+            Box(
                 modifier = Modifier
-                    .size(500.dp)
-                    .align(Alignment.Center)
-                    .padding(16.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            IconButton(onClick = {
-                if (selectedPhotocard != null) {
-                    viewModel.updatePrioStatus(selectedPhotocard)
-                }
-            }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.estrella),
-                    contentDescription = "Prio",
-                    tint = Color.Unspecified
-                )
-            }
-
-            IconButton(onClick = {
-                if (selectedPhotocard != null) {
-                viewModel.updateOTWStatus(selectedPhotocard) }}) {
-                Icon(
-                    painter = painterResource(id = R.drawable.carta),
-                    contentDescription = "OTW",
-                    tint = Color.Unspecified
-                )
-            }
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier
+                    .fillMaxWidth()
                     .weight(1f)
-                    .padding(16.dp)
             ) {
-                Text(
-                    text = "DATOS DE LA PHOTOCARD",
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.size(16.dp))
-                Text(text = "GRUPO: ${selectedPhotocard?.groupName}")
-                Text(text = "IDOL: ${selectedPhotocard?.idolName}")
-                Text(text = "ALBUM: ${selectedPhotocard?.albumName}")
-                Text(text = "TIPO: ${selectedPhotocard?.type}")
-                Text(text = "VERSION: ${selectedPhotocard?.photocardVersion}")
-                Text(text = "PRECIO: ${selectedPhotocard?.value}")
+                AsyncImage(
+                    model = selectedPhotocard?.photocardURL,
+                    contentDescription = "Photocard seleccionada",
+                    modifier = Modifier
+                        .size(500.dp)
+                        .align(Alignment.Center)
+                        .padding(16.dp)
+                )
             }
-            
-        }
-        Spacer(modifier = Modifier.height(16.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            ElevatedButton(
-                onClick = {
-                    if (lastScreen != null) {
-                        viewModel.deletePhotocard(lastScreen, selectedPhotocard!!)
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                IconButton(onClick = {
+                    if (selectedPhotocard != null) {
+                        viewModel.updatePrioStatus(selectedPhotocard)
                     }
-                },
-                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error)
-            ) {
-                Text(text = "BORRAR")
-            }
-            if (isLastScreenCollecion(lastScreen)){
-                Button(
-                    onClick = {
-                        viewModel.moveFromColtoWishlist(selectedPhotocard!!)
-                    },
-                    enabled = isLastScreenCollecion(lastScreen)
-                ) {
-                    Text(text = "MOVER A WISHLIST")
+                }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.estrella),
+                        contentDescription = "Prio",
+                        tint = Color.Unspecified
+                    )
+                }
+
+                IconButton(onClick = {
+                    if (selectedPhotocard != null) {
+                        viewModel.updateOTWStatus(selectedPhotocard) }}) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.carta),
+                        contentDescription = "OTW",
+                        tint = Color.Unspecified
+                    )
                 }
             }
-            if (!isLastScreenCollecion(lastScreen)){
-                Button(
-                    onClick = {
-                        viewModel.moveFromWishlisttoCol(selectedPhotocard!!)
-                    },
-                    enabled = !isLastScreenCollecion(lastScreen)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(16.dp)
                 ) {
-                    Text(text = "MOVER A COLECCION")
+                    Text(
+                        text = "DATOS DE LA PHOTOCARD",
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.size(16.dp))
+                    Text(text = "GRUPO: ${selectedPhotocard?.groupName}")
+                    Text(text = "IDOL: ${selectedPhotocard?.idolName}")
+                    Text(text = "ALBUM: ${selectedPhotocard?.albumName}")
+                    Text(text = "TIPO: ${selectedPhotocard?.type}")
+                    Text(text = "VERSION: ${selectedPhotocard?.photocardVersion}")
+                    Text(text = "PRECIO: ${selectedPhotocard?.value}")
+                }
+
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            ElevatedButton(onClick = { viewModel.onEditModeChanged(true) }, modifier = Modifier.fillMaxWidth()) {
+                Text(text = "ACTIVAR MODO EDICIÓN")
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                ElevatedButton(
+                    onClick = {
+                        if (lastScreen != null) {
+                            viewModel.deletePhotocard(lastScreen, selectedPhotocard!!)
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error)
+                ) {
+                    Text(text = "BORRAR")
+                }
+                if (isLastScreenCollecion(lastScreen)){
+                    Button(
+                        onClick = {
+                            viewModel.moveFromColtoWishlist(selectedPhotocard!!)
+                        },
+                        enabled = isLastScreenCollecion(lastScreen)
+                    ) {
+                        Text(text = "MOVER A WISHLIST")
+                    }
+                }
+                if (!isLastScreenCollecion(lastScreen)){
+                    Button(
+                        onClick = {
+                            viewModel.moveFromWishlisttoCol(selectedPhotocard!!)
+                        },
+                        enabled = !isLastScreenCollecion(lastScreen)
+                    ) {
+                        Text(text = "MOVER A COLECCION")
+                    }
+                }
+            }
+
+
+        }
+    }
+    if (editMode.value == true){
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)){
+            Row(modifier=Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly){
+                ElevatedButton(onClick = { viewModel.onEditModeChanged(false)
+                    navController.navigate("home_screen") }) {
+                    Text(text = "Cancelar")
+                }
+                ElevatedButton(onClick = { viewModel.onEditModeChanged(false)
+                navController.navigate("home_screen")}) {
+                    Text(text = "Aplicar cambios")
                 }
             }
         }
-
-
     }
+
     toastMessage?.let { showDetailToast(message = it) }
 }
 

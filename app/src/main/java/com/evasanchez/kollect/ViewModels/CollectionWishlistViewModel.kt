@@ -45,6 +45,13 @@ class CollectionWishlistViewModel: ViewModel() {
     private val _groupName =MutableLiveData<String>()
     val groupName : LiveData<String> = _groupName
 
+    val _editMode = MutableLiveData<Boolean> ()
+    val editMode: LiveData<Boolean> = _editMode
+
+    fun onEditModeChanged(editModeChanged: Boolean) {
+        _editMode.value = editModeChanged
+    }
+
 
     init {
         Log.d("Init", "Entra en el init de HomeScreen")
