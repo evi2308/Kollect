@@ -50,7 +50,9 @@ import com.evasanchez.kollect.navigation.AppScreens
 fun SearchScreen(navController: NavController, viewModel: SearchViewModel){
     val searchText by viewModel.searchText.collectAsState()
     val users by viewModel.users.collectAsState()
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(16.dp)) {
         OutlinedTextField(value = searchText, onValueChange = viewModel::onSearchTextChanged,modifier=Modifier.fillMaxWidth(), placeholder = { Text(text = "Buscar")}, shape = RoundedCornerShape(16.dp), leadingIcon = {Icon(imageVector = Icons.Outlined.Search, contentDescription = null)})
         Spacer(modifier = Modifier.height(16.dp))
         if(searchText.isNotBlank()){
@@ -67,7 +69,10 @@ fun SearchScreen(navController: NavController, viewModel: SearchViewModel){
                                     onClick = {
                                         Log.d("Busqueda", "User clickado: ${user.username}")
                                         viewModel.selectedUser(user)
-                                        Log.d("Busqueda", "User ${viewModel.selectedUserDetail?.username}")
+                                        Log.d(
+                                            "Busqueda",
+                                            "User ${viewModel.selectedUserDetail?.username}"
+                                        )
                                         if (viewModel.selectedUserDetail != null) {
                                             navController.navigate(AppScreens.WishlistSearchScreen.route)
                                         }

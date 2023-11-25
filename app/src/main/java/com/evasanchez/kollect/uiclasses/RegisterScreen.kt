@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -15,6 +16,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -80,6 +82,8 @@ fun Register(modifier: Modifier, navController: NavController, viewModel: Regist
         PasswordRegister(modifier, password, { viewModel.onRegisterChanged(email, it, username) }, isPassVisible
         )
         Spacer(modifier = Modifier.padding(4.dp))
+        Text(text = "El botón no se activará si no se cumplen las condiciones",fontSize = 15.sp, style = TextStyle(color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold))
+        Spacer(modifier = Modifier.height(8.dp))
         RegistrarButton(loginEnabled) {
             viewModel.createUserEmailPassword(email, password) {
                 navController.navigate(AppScreens.LoginScreen.route)
@@ -95,7 +99,7 @@ fun Register(modifier: Modifier, navController: NavController, viewModel: Regist
 
 @Composable
 fun RegistrarButton(loginEnabled: Boolean, createUserEmailPassword: () -> Unit) {
-    Button(
+    ElevatedButton(
         onClick = {
             if (loginEnabled) {
                 createUserEmailPassword()
@@ -104,10 +108,6 @@ fun RegistrarButton(loginEnabled: Boolean, createUserEmailPassword: () -> Unit) 
         modifier = Modifier
             .fillMaxWidth()
             .height(40.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFFF1D5DB),
-            disabledContainerColor = Color(0xFF7D5260)
-            ),
         enabled = loginEnabled
     ) {
         Text(text = "Registrarse")
@@ -131,7 +131,7 @@ fun emailRegister(modifier: Modifier, email: String, onTextFieldChanged: (String
         Text(
             text = "Introduce tu E-Mail",
             textAlign = TextAlign.Left,
-            color = Color(0xFF7D5260),
+            color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(8.dp)
         )
@@ -140,7 +140,6 @@ fun emailRegister(modifier: Modifier, email: String, onTextFieldChanged: (String
             onValueChange = { onTextFieldChanged(it) },
             placeholder = { Text("ejemplo@ejemplo.com") },
             modifier = Modifier.fillMaxWidth(),
-            textStyle = TextStyle(color = Color.Black),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true,
             maxLines = 1,
@@ -157,6 +156,7 @@ fun emailRegister(modifier: Modifier, email: String, onTextFieldChanged: (String
             ),
             shape = RoundedCornerShape(15.dp)
         )
+        Text(text = "Introduce un E-mail válido que no esté en uso", fontSize = 15.sp, style = TextStyle(color = MaterialTheme.colorScheme.tertiary))
     }
 }
 
@@ -167,7 +167,7 @@ fun usernameRegister(modifier: Modifier, username: String, onTextFieldChanged: (
         Text(
             text = "Introduce tu nombre de usuario",
             textAlign = TextAlign.Left,
-            color = Color(0xFF7D5260),
+            color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(8.dp)
         )
@@ -176,7 +176,6 @@ fun usernameRegister(modifier: Modifier, username: String, onTextFieldChanged: (
             onValueChange = { onTextFieldChanged(it) },
             placeholder = { Text(text = "username") },
             modifier = Modifier.fillMaxWidth(),
-            textStyle = TextStyle(color = Color.Black),
             singleLine = true,
             maxLines = 1,
             label = { Text("username") },
@@ -191,6 +190,8 @@ fun usernameRegister(modifier: Modifier, username: String, onTextFieldChanged: (
             ),
             shape = RoundedCornerShape(15.dp)
         )
+
+        Text(text = "Introduce un nombre de usuario válido que no esté en uso", fontSize = 15.sp, style = TextStyle(color = MaterialTheme.colorScheme.tertiary))
     }
 }
 
@@ -201,7 +202,7 @@ fun PasswordRegister(modifier: Modifier,password: String, onTextFieldChanged: (S
     Text(
         text = "Introduce tu contraseña",
         textAlign = TextAlign.Left,
-        color = Color(0xFF7D5260),
+        color = MaterialTheme.colorScheme.primary,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(8.dp)
     )
@@ -212,7 +213,7 @@ fun PasswordRegister(modifier: Modifier,password: String, onTextFieldChanged: (S
     OutlinedTextField(value = password,
         onValueChange = {onTextFieldChanged(it)},
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        textStyle = TextStyle(color = Color.Black),
+        modifier = Modifier.fillMaxWidth(),
         singleLine = true,
         maxLines = 1,
         label = { Text("Contraseña") },
@@ -221,9 +222,6 @@ fun PasswordRegister(modifier: Modifier,password: String, onTextFieldChanged: (S
             placeholderColor = Color(0xFFFFFFFF),
             focusedBorderColor = MaterialTheme.colorScheme.primary,
             unfocusedBorderColor = MaterialTheme.colorScheme.primary
-            //focusedIndicatorColor = Color.Transparent,
-            //unfocusedIndicatorColor = Color.Transparent,
-            //disabledIndicatorColor = Color.Transparent
         ),
         shape = RoundedCornerShape(15.dp),
         visualTransformation = visualTransformation,
@@ -233,6 +231,8 @@ fun PasswordRegister(modifier: Modifier,password: String, onTextFieldChanged: (S
             }
         }
     )
+    Spacer(modifier = Modifier.size(16.dp))
+    Text(text = "La contraseña debe contener al menos 8 caracteres, una minúscula, una mayúscula, un número y un caracter especial", fontSize = 15.sp, style = TextStyle(color = MaterialTheme.colorScheme.tertiary))
 
 }
 

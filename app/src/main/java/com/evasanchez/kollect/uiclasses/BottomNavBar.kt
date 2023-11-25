@@ -58,12 +58,6 @@ fun BottomNavigationBar(navController : NavController) {
             navRoute = "search_screen"
         ),
         BottomNavigationItem(
-            title = "Mensajes",
-            selectedIcon =  Icons.Filled.Message,
-            unselectedIcon =  Icons.Outlined.Message,
-            navRoute = "home_screen"
-        ),
-        BottomNavigationItem(
             title = "Perfil",
             selectedIcon =  Icons.Filled.AccountCircle,
             unselectedIcon =  Icons.Outlined.AccountCircle,

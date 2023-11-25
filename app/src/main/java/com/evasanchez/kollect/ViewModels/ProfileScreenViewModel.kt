@@ -1,6 +1,7 @@
 package com.evasanchez.kollect.ViewModels
 
 import android.app.Activity
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,9 +14,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlin.random.Random
 
 class ProfileScreenViewModel : ViewModel() {
     private val _allGroups = MutableLiveData<List<String>>()
@@ -23,6 +26,7 @@ class ProfileScreenViewModel : ViewModel() {
     private val auth: FirebaseAuth = Firebase.auth
     val userID = auth.currentUser?.uid
     val db = Firebase.firestore
+
     private val _kGroup = MutableLiveData<String>()
     val kGroup: LiveData<String> = _kGroup
 
@@ -41,6 +45,7 @@ class ProfileScreenViewModel : ViewModel() {
     private val _username = MutableLiveData<String>()
     val username: LiveData<String> = _username
 
+
     fun showSuccessToast(message: String) {
         _successMessage.postValue(message)
     }
@@ -49,8 +54,9 @@ class ProfileScreenViewModel : ViewModel() {
         val db = FirebaseFirestore.getInstance()
         db.firestoreSettings = FirebaseFirestoreSettings.Builder().build()
         viewModelScope.launch {
-            getKGroupListRepository()}
-            }
+            getKGroupListRepository()
+        }
+    }
 
     private var subColReference: CollectionReference? = null // Subcollection reference
 
@@ -64,7 +70,7 @@ class ProfileScreenViewModel : ViewModel() {
     }
 
 
-     fun addKgroupToUser(kGroup: String) {
+    fun addKgroupToUser(kGroup: String) {
         viewModelScope.launch(Dispatchers.IO) {
             subColReference = userID?.let { getSubcollectionReference(it) }
             if (subColReference != null) {
@@ -87,13 +93,15 @@ class ProfileScreenViewModel : ViewModel() {
 
 
     }
-    fun addIdolToUser(kGroup: String, idol:String) {
+
+    fun addIdolToUser(kGroup: String, idol: String) {
         viewModelScope.launch(Dispatchers.IO) {
             subColReference = userID?.let { getIdolSubColReference(it) }
             if (subColReference != null) {
                 val idolData = mapOf(
                     "group_name" to kGroup,
-                    "idol_name" to idol)
+                    "idol_name" to idol
+                )
                 subColReference!!.add(idolData)
                     .addOnSuccessListener {
                         Log.d("Idol añadido", "Se ha añadido el idol, ${idolData}")
@@ -112,7 +120,7 @@ class ProfileScreenViewModel : ViewModel() {
 
     }
 
-    suspend fun getIdolSubColReference(userId: String): CollectionReference{
+    suspend fun getIdolSubColReference(userId: String): CollectionReference {
         val usersCollection = db.collection("usuario")
         val query = usersCollection.whereEqualTo("user_id", userId)
         val querySnapshot = query.get().await()
@@ -126,7 +134,7 @@ class ProfileScreenViewModel : ViewModel() {
         }
     }
 
-    // Function to get the subcollection reference
+    // Sacar SubCollecion para los grupos
     suspend fun getSubcollectionReference(userId: String): CollectionReference {
         val usersCollection = db.collection("usuario")
         val query = usersCollection.whereEqualTo("user_id", userId)
@@ -141,7 +149,7 @@ class ProfileScreenViewModel : ViewModel() {
         }
     }
 
-    // Function to get a list of documents in the subcollection
+    // Lista de los grupos
     suspend fun getKGroupListRepository() {
         viewModelScope.launch(Dispatchers.IO) {
             val subColReference = userID?.let { getSubcollectionReference(it) }
@@ -168,12 +176,13 @@ class ProfileScreenViewModel : ViewModel() {
         }
     }
 
-    suspend fun getProfilePicture(){
+    suspend fun getProfilePicture() {
         val usersCollection = db.collection("usuario")
         viewModelScope.launch(Dispatchers.IO) {
             if (usersCollection != null) {
                 try {
-                    val usernameQuery = usersCollection.whereEqualTo("user_id", userID).get().await()
+                    val usernameQuery =
+                        usersCollection.whereEqualTo("user_id", userID).get().await()
                     for (document in usernameQuery.documents) {
                         val pfpURL = document.getString("pfpURL")
                         if (pfpURL != null) {
@@ -188,13 +197,15 @@ class ProfileScreenViewModel : ViewModel() {
         }
 
 
-}
-    suspend fun getUsername(){
+    }
+
+    suspend fun getUsername() {
         val usersCollection = db.collection("usuario")
         viewModelScope.launch(Dispatchers.IO) {
             if (usersCollection != null) {
                 try {
-                    val usernameQuery = usersCollection.whereEqualTo("user_id", userID).get().await()
+                    val usernameQuery =
+                        usersCollection.whereEqualTo("user_id", userID).get().await()
                     for (document in usernameQuery.documents) {
                         val username = document.getString("username")
                         if (username != null) {
@@ -214,6 +225,7 @@ class ProfileScreenViewModel : ViewModel() {
         auth.signOut()
         context.finishActivity(0)
     }
+
     suspend fun getColeccionSubcollectionReference(userId: String): CollectionReference {
         val usersCollection = db.collection("usuario")
         val query = usersCollection.whereEqualTo("user_id", userId)
@@ -227,6 +239,7 @@ class ProfileScreenViewModel : ViewModel() {
             throw NoSuchElementException("User not found")
         }
     }
+
     private val _showDialog = MutableLiveData<Boolean>()
     val showDialog: LiveData<Boolean> = _showDialog
     private val _dialogText = MutableLiveData<String>()
@@ -262,14 +275,49 @@ class ProfileScreenViewModel : ViewModel() {
                 var count_pcs = querySnapshot.size()
                 _showDialog.postValue(true)
                 _dialogText.postValue("Número de Photocards en tu coleccion: ${count_pcs}")
-                }
-
             }
 
         }
 
+    }
+
     fun onDismissDialog() {
         _showDialog.value = false
+    }
+
+    fun changeProfilePicture(uri: Uri?) {
+        val usersCollection = db.collection("usuario")
+        val storage = FirebaseStorage.getInstance()
+        val storageRef = storage.reference
+        var randomNum: String = Random.nextInt().toString()
+        var pfpNameStorage = "pfp- ${randomNum} "
+        val pfpNameStorageRef = storageRef.child("profilePics/${pfpNameStorage}")
+        viewModelScope.launch {
+            val userID = auth.currentUser?.uid
+            val usernameQuery = usersCollection.whereEqualTo("user_id", userID).get().await()
+            if (uri != null) {
+                val uploadTask = uri?.let { pfpNameStorageRef.putFile(it) }
+                if (uploadTask != null) {
+                    uploadTask.addOnFailureListener {
+                        Log.d("Error al subir la imagen", "Ha habido algun error")
+                    }.addOnSuccessListener { taskSnapshot ->
+                        pfpNameStorageRef.downloadUrl.addOnSuccessListener { uri ->
+                            // Sacar la URI del archivo desde el storage
+                            val document = usernameQuery.documents.first()
+                            if (document != null) {
+                                document.reference.update("pfpURL", uri.toString()).addOnSuccessListener {
+                                    Log.d("Foto de perfil", "Foto actualizada")
+                                    _profilePicture.postValue(uri.toString())
+
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+
     }
 }
 

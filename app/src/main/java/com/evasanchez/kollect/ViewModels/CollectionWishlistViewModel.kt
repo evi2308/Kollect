@@ -95,14 +95,6 @@ class CollectionWishlistViewModel: ViewModel() {
     init {
         Log.d("Init", "Entra en el init de HomeScreen")
         val db = FirebaseFirestore.getInstance()
-        //viewModelScope.launch {
-        //  getPhotocardsList()  }
-
-    }
-
-    // Funciones para rellenar los dropdown para el filtro?
-    fun showInfoToast(message: String) {
-        //_InfoMessage.postValue(message)
     }
 
     fun onGroupSelected(groupName: String) {
@@ -435,7 +427,7 @@ class CollectionWishlistViewModel: ViewModel() {
             val documentPath = documentSnapshot.reference.path
             return db.document(documentPath).collection("Kgroups")
         } else {
-            throw NoSuchElementException("User not found")
+            throw NoSuchElementException("Usuario no encontrado")
         }
     }
 
@@ -443,7 +435,6 @@ class CollectionWishlistViewModel: ViewModel() {
         _showDialog.value = false
     }
 
-    //ARREGLAR
     fun updatePrioStatus(photocard: Photocard) {
         viewModelScope.launch(Dispatchers.IO) {
             val userID = FirebaseAuth.getInstance().currentUser?.uid
@@ -652,6 +643,63 @@ class CollectionWishlistViewModel: ViewModel() {
                             subColReference.document(document.id).update(photocardData).addOnSuccessListener {
                                 showToast("La photocard se ha editado ")
                                 getPhotocardsWishlistList()
+
+                                //Se les vuelve a dar el valor ya que al estar en un mismo viewModel no se reincia al cerrar la pantalla de PhotocardDetail
+                                _newPhotocardUri.postValue(Uri.EMPTY)
+                                _newValue.postValue("")
+                                _newPhotocardVersion.postValue("")
+                                _newType.postValue("")
+                            }
+
+                        }
+                    }
+                }
+            }
+            if (photocard.status == "Coleccion") {
+                Log.d("Photocard de Coleccion", "La photocard pertenece a la collecion")
+                val subColReference = userID?.let { getColeccionSubcollectionReference(it) }
+                Log.d("REFERENCIA A LA SUBCOL", "${subColReference}")
+                if (subColReference != null) {
+                    val photocardQuery =
+                        subColReference.whereEqualTo("photocard_id", photocard.photocardId).get()
+                            .await()
+
+                    val document = photocardQuery.documents.first()
+                    if (document != null) {
+                        val photocardData = document.data
+                        Log.d("PHOTOCARD DATA", "${photocardData}")
+                        if (newValue.value!= "") {
+                            Log.d("Nuevo valor", "${newValue.value}")
+                            photocardData?.set("value", newValue.value.toString())
+                        }
+                        if (newType.value!="") {
+                            Log.d("Nuevo tipo", "${newType.value}")
+                            photocardData?.set("type", newType.value.toString())
+                        }
+                        if (newPhotocardVersion.value!="") {
+                            Log.d("Nueva version", "${newPhotocardVersion.value}")
+                            photocardData?.set("photocard_version", newPhotocardVersion.value.toString())
+                        }
+                        if (newPhotocardUri!= Uri.EMPTY) {
+                            Log.d("Nueva URI", "${newPhotocardUri.value}")
+                            viewModelScope.launch{
+                                createPhotocard(photocard)
+                                val newPhotocardURL : String = newPhotocardUri.value.toString()
+                                photocardData?.set("photocard_url",newPhotocardURL)
+                            }
+
+
+                        }
+                        if (photocardData != null) {
+                            subColReference.document(document.id).update(photocardData).addOnSuccessListener {
+                                showToast("La photocard se ha editado ")
+                                getPhotocardsWishlistList()
+
+                                //Se les vuelve a dar el valor ya que al estar en un mismo viewModel no se reincia al cerrar la pantalla de PhotocardDetail
+                                _newPhotocardUri.postValue(Uri.EMPTY)
+                                _newValue.postValue("")
+                                _newPhotocardVersion.postValue("")
+                                _newType.postValue("")
                             }
 
                         }

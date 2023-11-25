@@ -6,26 +6,38 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddToPhotos
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -54,6 +66,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -93,6 +106,9 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
         viewModel.getUsername()
     }
     val scrollState = rememberScrollState()
+    var expandedDropDown by remember {
+        mutableStateOf(false)
+    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -107,12 +123,9 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
                     )
                 },
                 actions = {
-                    IconButton(onClick = {
+                    IconButton(onClick = { viewModel.logout(context)
                         navController.navigate("login_screen")}) {
                         Icon(Icons.Filled.ExitToApp, contentDescription = "Cerrar sesión")
-                    }
-                    IconButton(onClick = { /* Handle the click */ }) {
-                        Icon(Icons.Filled.Settings, contentDescription = "Configuración del perfil")
                     }
                 },
                 colors = TopAppBarDefaults.smallTopAppBarColors(MaterialTheme.colorScheme.secondaryContainer)
@@ -127,13 +140,12 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
                 .height(150.dp)
                 .align(Alignment.CenterHorizontally)
                 .padding(16.dp)
-                .clip(CircleShape)
                 .border(
                     width = 1.dp,
                     color = MaterialTheme.colorScheme.onBackground,
                     shape = CircleShape
-                )
-
+                ),
+                viewModel
             )
             showUsername(usernameDef)
             Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp, modifier = Modifier.padding(16.dp))
@@ -239,10 +251,31 @@ fun GroupText(){
 }
 
 @Composable
-fun ProfileImage(profilePicture: String, modifier: Modifier) {
+fun ProfileImage(profilePicture: String, modifier: Modifier, viewModel: ProfileScreenViewModel) {
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) {
+            viewModel.changeProfilePicture(uri)
+        }
+    }
+    Box(modifier = Modifier.fillMaxSize().padding(8.dp)){
+        AsyncImage(model = profilePicture, contentDescription = "ProfilePic", modifier = Modifier
+            .size(130.dp)
+            .clip(CircleShape)
+            .border(1.dp, Color.Black, CircleShape)
+            .then(
+                Modifier
+                    .fillMaxSize()
+                    .align(Alignment.Center)
+            ),
+            contentScale = ContentScale.Crop, alignment = Alignment.Center)
 
-    AsyncImage(model = profilePicture, contentDescription = "ProfilePic", modifier = modifier)
+    }
+    ElevatedButton(onClick = { launcher.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly)) }) {
+        Text(text = "Cambiar foto de perfil")
+    }
+
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddKGroup(viewModel: ProfileScreenViewModel, kGroup: String, onKgroupChanged: (String) -> Unit, addKgroupToUser: () -> Unit) {
@@ -277,7 +310,6 @@ fun AddKGroup(viewModel: ProfileScreenViewModel, kGroup: String, onKgroupChanged
 
     ElevatedButton(
         onClick = {
-            Log.d("Hola", "El boton hace click")
             Thread.sleep(3000)
             addKgroupToUser()
 
@@ -356,6 +388,23 @@ fun AlertDialogProfileScreen(
     )
 
 }
+
+@Composable
+fun ChangeProfilePicture(viewModel: ProfileScreenViewModel, activateChangePfp : Boolean) {
+    var pfpAlertDialogExpanded by remember { mutableStateOf(false) }
+    if (pfpAlertDialogExpanded){
+    }
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) {
+            pfpAlertDialogExpanded = true
+        }
+    }
+    launcher.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly))
+    var activateChangePfp = false
+
+}
+
+
 
 
 
