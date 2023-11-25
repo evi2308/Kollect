@@ -107,7 +107,7 @@ fun MyProfileScreen(navController: NavHostController, viewModel : ProfileScreenV
                     )
                 },
                 actions = {
-                    IconButton(onClick = {
+                    IconButton(onClick = { viewModel.logout(context)
                         navController.navigate("login_screen")}) {
                         Icon(Icons.Filled.ExitToApp, contentDescription = "Cerrar sesión")
                     }

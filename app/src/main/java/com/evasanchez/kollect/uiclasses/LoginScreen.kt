@@ -122,11 +122,6 @@ fun Login(modifier: Modifier, viewModel: LoginScreenViewModel, navController: Na
 
         }
     }
-   /* if (viewModel.showErrorDialog.observeAsState(initial = false).value){
-        AlertDialog(
-            onDismissRequest = {viewModel.onDismissErrorDialog()}
-        )
-    }*/
 
 }
 
@@ -135,10 +130,10 @@ fun TextEmail() {
     Text(
         text = "Introduce tu E-Mail",
         textAlign = TextAlign.Left,
-        color = Color(0xFF7D5260),
+        color = MaterialTheme.colorScheme.primary,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(8.dp)
-    )
+        modifier = Modifier.padding(8.dp))
+
 }
 
 @Composable
@@ -146,18 +141,18 @@ fun TextPassword() {
     Text(
         text = "Introduce tu contraseña",
         textAlign = TextAlign.Left,
-        color = Color(0xFF7D5260),
+        color = MaterialTheme.colorScheme.primary,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(8.dp)
-    )
+        modifier = Modifier.padding(8.dp))
+
 }
 
 @Composable
 fun RegisterButton(navController: NavController) {
-    Button(
+    ElevatedButton(
         onClick = { navController.navigate(AppScreens.RegisterScreen.route) },
         modifier = Modifier
-            .height(48.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF1D5DB))
+            .height(48.dp)
     ) {
         Text(text = "Registrarse")
     }
@@ -174,10 +169,6 @@ fun LoginButton(loginEnabled: Boolean, singInEmailPassword: () -> Unit) {
         },
         modifier = Modifier
             .height(48.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFFF1D5DB),
-            disabledContainerColor = Color(0xFF7D5260)
-        ),
         enabled = loginEnabled
     ) {
         Text(text = "Iniciar Sesión")
@@ -209,32 +200,6 @@ fun PasswordField(password: String, onTextFieldChanged: (String) -> Unit, isPass
             focusedBorderColor = MaterialTheme.colorScheme.primary,
             unfocusedBorderColor = MaterialTheme.colorScheme.primary,
 
-            //focusedIndicatorColor = Color.Transparent,
-            //unfocusedIndicatorColor = Color.Transparent,
-            //disabledIndicatorColor = Color.Transparent
-        ),
-        shape = RoundedCornerShape(15.dp),
-        visualTransformation = visualTransformation,
-        trailingIcon = {
-            if (password != "") {
-                IsPassVisibleIcon(isPassVisible)
-            }
-        }
-    )
-    /*TextField(value = password,
-        onValueChange = { onTextFieldChanged(it) },
-        modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text(text = "*********") },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        singleLine = true,
-        maxLines = 1,
-        colors = TextFieldDefaults.textFieldColors(
-            textColor = Color(0xFFFFFFFF),
-            containerColor = Color(0xFFF1D5DB),
-            placeholderColor = Color(0xFFFFFFFF),
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent
 
         ),
         shape = RoundedCornerShape(15.dp),
@@ -244,7 +209,8 @@ fun PasswordField(password: String, onTextFieldChanged: (String) -> Unit, isPass
                 IsPassVisibleIcon(isPassVisible)
             }
         }
-    )*/
+    )
+
 }
 
 @Composable
@@ -280,9 +246,6 @@ fun EmailField(email: String, onTextFieldChanged: (String) -> Unit) {
             focusedBorderColor = MaterialTheme.colorScheme.primary,
             unfocusedBorderColor = MaterialTheme.colorScheme.primary,
 
-            //focusedIndicatorColor = Color.Transparent,
-            //unfocusedIndicatorColor = Color.Transparent,
-            //disabledIndicatorColor = Color.Transparent
         ),
         shape = RoundedCornerShape(15.dp)
     )
